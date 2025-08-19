@@ -1,0 +1,14 @@
+Computer electronics E-commerce Website
+
+Features and functionalities:
+	(buyer side)
+	view shopping items
+	can add items to the cart
+	can chat with the seller
+	can filter based on the categories and tags of the computer
+	Can rate products and sellers 
+	Can comment on products and review sellers
+	
+	
+	(seller side)
+	Can explore CRUD functionalities when it comes to computers and categorizing them
