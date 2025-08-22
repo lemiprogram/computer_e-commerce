@@ -2,15 +2,37 @@
     <!DOCTYPE html>
     <html>
     <head>
-        <title>{%block title%}{%endblock%}</title>
-
-                <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+        <title>{%block title%} Exposed Wires{%endblock%}</title>
+        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+        <link rel="stylesheet" href="{% static 'styles.css' %}">
+        <style type="text/tailwindcss">      
+            @theme {
+    --color-primary-100:#BFAE9F;
+    --color-primary-200:#937962;
+    --color-primary-300:#FFFFFF;
+    --color-accent-100:#C9BEB9;
+    --color-accent-200:#978178;
+    --color-text-100:#4D4D4D;
+    --color-text-200:#9e9e9e;
+    --color-bg-100:#F5EFE8;
+    --color-bg-200:#EEE3D7;
+    --color-bg-300:#FFFFFF;
+      
+    --color-faded-black:#00000005;
+                    
+                }    
+        </style>
                                 
 </head>
-    <body>
+    <body class="bg-bg-100">
+        {% block header %}{% include 'includes/header.html' %}{% endblock %}
         {% block content %}{% endblock %}
+        {% block footer %}{% include 'includes/footer.html' %}{% endblock %}
+
+        
         <script src="{% static 'scripts.js' %}"></script>
                             
     </body>
+
 </html>    
                             

@@ -1,8 +1,8 @@
 
 from django.urls import path
 from .views import *
-from django.contrib.auth.views import LogoutView    
-from django.conf import settings
 urlpatterns = [
-                    
+    path("cart/", cart_detail, name="cart_detail"),
+    path("cart/add/<int:product_id>/", add_to_cart, name="add_to_cart"),
+    path("cart/remove/<int:product_id>/", remove_from_cart, name="remove_from_cart"),
 ]

@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="max-w-md mx-auto bg-bg-200 shadow-lg rounded-2xl p-8 my-10">
+  <h2 class="text-2xl font-bold text-primary-200 mb-6 text-center">Sign Up</h2>
+
+  <form method="post" class="space-y-4">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    <div>
+      {{ form.username.label_tag }}  
+      {{ form.username }}
+      {{ form.username.errors }}
+    </div>
+
+    <div>
+      {{ form.email.label_tag }}  
+      {{ form.email }}
+      {{ form.email.errors }}
+    </div>
+
+    <div>
+      <label class="font-semibold">Account Type:</label>
+      {{ form.user_type }}
+      {{ form.user_type.errors }}
+    </div>
+
+    <div>
+      {{ form.password1.label_tag }}
+      {{ form.password1 }}
+      {{ form.password1.errors }}
+    </div>
+
+    <div>
+      {{ form.password2.label_tag }}
+      {{ form.password2 }}
+      {{ form.password2.errors }}
+    </div>
+
+    <button type="submit"
+            class="w-full bg-primary-100 hover:bg-accent-200 text-bg-300 font-bold py-2 px-4 rounded-lg shadow-md transition-all">
+      Create Account
+    </button>
+  </form>
+  <div class="mt-4 text-center">
+        <p class="text-text-200 text-sm">Already have an account? <a href="/accounts/sign_in" class="text-primary-100 hover:text-primary-200">Login</a></p>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock content %}

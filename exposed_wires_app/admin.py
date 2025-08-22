@@ -1,7 +1,11 @@
 
 from django.contrib import admin
-from .models import Computer_Ecommerce
+from .models import *
 
 # Register your models here.
-admin.site.register(Computer_Ecommerce)
-        
+
+
+admin.site.register(Shopper)
+admin.site.register(Seller)
+admin.site.register(Category)
+admin.site.register(Product)
