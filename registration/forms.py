@@ -16,34 +16,37 @@ class SignUpForm(UserCreationForm):
         max_length=150,
         required=True,
         widget=forms.TextInput(attrs={
-            "placeholder": "Username",
+            "placeholder": "Username...",
             "class": INPUT_CLASS
         })
     )
     email = forms.EmailField(
         required=True,
         widget=forms.EmailInput(attrs={
-            "placeholder": "Email",
+            "placeholder": "Email...",
             "class": INPUT_CLASS
         })
     )
     role = forms.ChoiceField(
         choices=USER_TYPE_CHOICES,
-        widget=forms.RadioSelect
+        widget=forms.Select(attrs={
+            'class': INPUT_CLASS
+        }),
+        initial=USER_TYPE_CHOICES[1],
         
     )
 
     password1 = forms.CharField(
         label="Password",
         widget=forms.PasswordInput(attrs={
-            "placeholder": "Password",
+            "placeholder": "Password...",
             "class": INPUT_CLASS
         })
     )
     password2 = forms.CharField(
         label="Confirm Password",
         widget=forms.PasswordInput(attrs={
-            "placeholder": "Confirm Password",
+            "placeholder": "Confirm Password...",
             "class": INPUT_CLASS
         })
     )

@@ -1,37 +1,125 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="min-h-screen bg-bg-100 flex items-center justify-center py-10">
-    <div class="bg-bg-300 shadow-lg rounded-2xl p-8 w-full max-w-3xl">
+<div class="min-h-screen bg-bg-100 py-10">
+    <div class="max-w-6xl mx-auto bg-bg-300 shadow-xl rounded-2xl p-8">
+
         <!-- Profile Header -->
-        <div class="flex items-center space-x-6 mb-8">
-            <div class="w-24 h-24 rounded-full bg-primary-100 flex items-center justify-center text-white text-3xl font-bold">
-                {{ user.username|first|upper }}
+        <div class="flex items-center justify-between border-b border-bg-200 pb-6 mb-6">
+            <div class="flex items-center space-x-6">
+                <div class="w-24 h-24 rounded-full bg-primary-100 flex items-center justify-center text-white text-4xl font-bold">
+                    {{ user.username|first|upper }}
+                </div>
+                <div>
+                    <h2 class="text-3xl font-bold text-text-100 capitalize">{{ user.username }}</h2>
+                    <p class="text-text-200">{{ user.email }}</p>
+                    <p class="text-text-200">Joined: {{ user.date_joined|date:"M d, Y" }}</p>
+                </div>
             </div>
-            <div>
-                <h2 class="text-2xl font-bold text-text-100">{{ user.username }}</h2>
-                <p class="text-text-200">{{ user.email }}</p>
-                <p class="text-text-200">Joined: {{ user.date_joined|date:"M d, Y" }}</p>
+            
+            <!-- Role Badge -->
+            {% if user.role == "shopper" %}
+                <span class="px-4 py-2 rounded-full bg-primary-200 text-white font-semibold">Shopper</span>
+            {% elif user.role == "seller" %}
+                <span class="px-4 py-2 rounded-full bg-accent-200 text-white font-semibold">Seller</span>
+            {% elif user.role == "admin" %}
+                <span class="px-4 py-2 rounded-full bg-text-100 text-white font-semibold">Admin</span>
+            {% endif %}
+        </div>
+
+        <!-- Quick Stats (common for all) -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
+            <div class="bg-bg-200 rounded-xl p-6 text-center shadow-md">
+                <p class="text-xl font-bold text-primary-200">{{ orders_count|default:0 }}</p>
+                <p class="text-text-200">Orders</p>
+            </div>
+            <div class="bg-bg-200 rounded-xl p-6 text-center shadow-md">
+                <p class="text-xl font-bold text-primary-200">{{ cart_items_count|default:0 }}</p>
+                <p class="text-text-200">Cart Items</p>
+            </div>
+            <div class="bg-bg-200 rounded-xl p-6 text-center shadow-md">
+                <p class="text-xl font-bold text-primary-200">{{ wishlist_count|default:0 }}</p>
+                <p class="text-text-200">Wishlist</p>
+            </div>
+            <div class="bg-bg-200 rounded-xl p-6 text-center shadow-md">
+                <p class="text-xl font-bold text-primary-200">{{ reviews_count|default:0 }}</p>
+                <p class="text-text-200">Reviews</p>
             </div>
         </div>
 
-        <!-- Profile Info -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="bg-bg-200 rounded-xl p-6">
-                <h3 class="text-lg font-semibold text-text-100 mb-3">Account Details</h3>
-                <p><span class="font-semibold">Username:</span> {{ user.username }}</p>
-                <p><span class="font-semibold">Email:</span> {{ user.email }}</p>
+        <!-- Role-Specific Sections -->
+        {% if user.role == "shopper" %}
+            <!-- Shopper Dashboard -->
+            <div class="bg-bg-200 rounded-xl p-6 mb-10 shadow-md">
+                <h3 class="text-xl font-semibold text-text-100 mb-4">Shopping Info</h3>
+                <p><span class="font-semibold">Active Cart Items:</span> {{ cart_items_count|default:0 }}</p>
+                <p><span class="font-semibold">Past Orders:</span> {{ orders_count|default:0 }}</p>
+                <p><span class="font-semibold">Wishlist:</span> {{ wishlist_count|default:0 }}</p>
             </div>
+        
+        {% elif user.role == "seller" %}
+            <!-- Seller Dashboard -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                <div class="bg-bg-200 rounded-xl p-6 shadow-md">
+                    <h3 class="text-lg font-semibold text-text-100 mb-2">Products</h3>
+                    <p class="text-2xl font-bold text-primary-200">{{ products_count|default:0 }}</p>
+                </div>
+                <div class="bg-bg-200 rounded-xl p-6 shadow-md">
+                    <h3 class="text-lg font-semibold text-text-100 mb-2">Total Sales</h3>
+                    <p class="text-2xl font-bold text-primary-200">${{ total_sales|default:0 }}</p>
+                </div>
+                <div class="bg-bg-200 rounded-xl p-6 shadow-md">
+                    <h3 class="text-lg font-semibold text-text-100 mb-2">Store Rating</h3>
+                    <p class="text-2xl font-bold text-primary-200">{{ rating|default:"N/A" }}</p>
+                </div>
+            </div>
+        
+        {% elif user.role == "admin" %}
+            <!-- Admin Dashboard -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                <div class="bg-bg-200 rounded-xl p-6 shadow-md">
+                    <h3 class="text-lg font-semibold text-text-100 mb-2">Total Users</h3>
+                    <p class="text-2xl font-bold text-primary-200">{{ total_users|default:0 }}</p>
+                </div>
+                <div class="bg-bg-200 rounded-xl p-6 shadow-md">
+                    <h3 class="text-lg font-semibold text-text-100 mb-2">Total Orders</h3>
+                    <p class="text-2xl font-bold text-primary-200">{{ total_orders|default:0 }}</p>
+                </div>
+                <div class="bg-bg-200 rounded-xl p-6 shadow-md">
+                    <h3 class="text-lg font-semibold text-text-100 mb-2">Revenue</h3>
+                    <p class="text-2xl font-bold text-primary-200">${{ total_revenue|default:0 }}</p>
+                </div>
+            </div>
+        {% endif %}
 
-            <div class="bg-bg-200 rounded-xl p-6">
-                <h3 class="text-lg font-semibold text-text-100 mb-3">Shopping Info</h3>
-                <p><span class="font-semibold">Orders:</span> {{ orders_count|default:0 }}</p>
-                <p><span class="font-semibold">Cart Items:</span> {{ cart_items_count|default:0 }}</p>
+        <!-- Recent Activity -->
+        <div class="mb-10">
+            <h3 class="text-xl font-semibold text-text-100 mb-4">Recent Activity</h3>
+            <div class="bg-bg-200 rounded-xl p-6 space-y-3">
+                {% if user.role == "shopper" %}
+                    {% for order in recent_orders %}
+                        <p class="text-text-100">🛒 Order #{{ order.id }} — {{ order.created_at|date:"M d, Y" }}</p>
+                    {% empty %}
+                        <p class="text-text-200">No recent orders.</p>
+                    {% endfor %}
+                {% elif user.role == "seller" %}
+                    {% for product in recent_products %}
+                        <p class="text-text-100">📦 {{ product.name }} — Added {{ product.created_at|date:"M d, Y" }}</p>
+                    {% empty %}
+                        <p class="text-text-200">No recent products.</p>
+                    {% endfor %}
+                {% elif user.role == "admin" %}
+                    {% for log in recent_logs %}
+                        <p class="text-text-100">⚡ {{ log.action }} — {{ log.created_at|date:"M d, Y" }}</p>
+                    {% empty %}
+                        <p class="text-text-200">No recent admin actions.</p>
+                    {% endfor %}
+                {% endif %}
             </div>
         </div>
 
         <!-- Actions -->
-        <div class="mt-8 flex justify-end space-x-4">
+        <div class="flex justify-end space-x-4">
             <a href="{% url 'password_change' %}" class="bg-primary-200 hover:bg-primary-100 text-white px-5 py-2 rounded-lg">
                 Change Password
             </a>

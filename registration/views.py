@@ -20,7 +20,7 @@ def sign_up(request):
             return sign_in(request)
         else:
             context['errors'] = form.errors
-    if  context['user'].email:
+    if  context['user'].is_authenticated:
         return redirect('account')
 
     form = SignUpForm()
@@ -31,9 +31,9 @@ def sign_in(request):
     if  request.user.username:
         return redirect('home')
     if request.method == 'POST':
-            email = request.POST['email']
-            password = request.POST['password']
-            user = authenticate(request,email=email,password=password)
+            username = request.POST['username']
+            password = request.POST['password1']
+            user = authenticate(request,username=username,password=password)
             if user is not None:
                 login(request, user)
                 return redirect('account')  

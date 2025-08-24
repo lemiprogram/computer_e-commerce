@@ -25,6 +25,7 @@ def account(request):
         'user' : request.user,
     }
     if context['user'].is_authenticated:
+        
         return render(request,'account.html', context)
     return redirect('sign_in')
 
