@@ -23,6 +23,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     ROLE_CHOICES = [
         ('shopper', 'Shopper'),
         ('seller', 'Seller'),
+        ('admin', 'Admin'),
     ]
 
     email = models.EmailField(unique=True)

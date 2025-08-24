@@ -43,7 +43,15 @@ class Condition(models.Model):
 
     def __str__(self):
         return self.name
+class Brand(models.Model):
+    brand = models.CharField(max_length=32,null=True,unique=True)
+    
+    class Meta:
+        ordering = ["-brand"]
 
+    def __str__(self):
+        return self.name
+    
 class Product(models.Model):
     seller = models.ForeignKey(
         Seller,
@@ -59,6 +67,13 @@ class Product(models.Model):
     )
     condition = models.ForeignKey(
         Condition,
+        on_delete=models.SET_NULL,
+        related_name="products",
+        null=True,
+        blank=True
+    )
+    brand = models.ForeignKey(
+        Brand,
         on_delete=models.SET_NULL,
         related_name="products",
         null=True,

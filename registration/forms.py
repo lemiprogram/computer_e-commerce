@@ -3,7 +3,91 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import CustomUser
 from exposed_wires_app.models import *
+from .models import *
 
+from django import forms
+from exposed_wires_app.models import Shopper, Seller
+
+# Tailwind style class for inputs
+INPUT_CLASS = "w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-100"
+
+
+class ShopperForm(forms.ModelForm):
+    phone = forms.CharField(
+        max_length=20,
+        required=False,
+        widget=forms.TextInput(attrs={
+            "placeholder": "Enter your phone number",
+            "class": INPUT_CLASS
+        })
+    )
+    address = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            "placeholder": "Enter your address",
+            "class": INPUT_CLASS,
+            "rows": 3
+        })
+    )
+    city = forms.CharField(
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={
+            "placeholder": "Enter your city",
+            "class": INPUT_CLASS
+        })
+    )
+
+    class Meta:
+        model = Shopper
+        fields = ["phone", "address", "city"]
+
+
+class SellerForm(forms.ModelForm):
+    store_name = forms.CharField(
+        max_length=100,
+        required=True,
+        widget=forms.TextInput(attrs={
+            "placeholder": "Enter your store name",
+            "class": INPUT_CLASS
+        })
+    )
+    store_description = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            "placeholder": "Describe your store",
+            "class": INPUT_CLASS,
+            "rows": 3
+        })
+    )
+    city = forms.CharField(
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={
+            "placeholder": "Enter your city",
+            "class": INPUT_CLASS
+        })
+    )
+    phone = forms.CharField(
+        max_length=20,
+        required=False,
+        widget=forms.TextInput(attrs={
+            "placeholder": "Enter your phone number",
+            "class": INPUT_CLASS
+        })
+    )
+    address = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            "placeholder": "Enter your address",
+            "class": INPUT_CLASS,
+            "rows": 3
+        })
+    )
+
+    class Meta:
+        model = Seller
+        fields = ["store_name", "store_description", "city", "phone", "address"]
 
 class SignUpForm(UserCreationForm):
     INPUT_CLASS = "w-full p-3 bg-bg-300 text-text-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-200"
@@ -32,8 +116,7 @@ class SignUpForm(UserCreationForm):
         widget=forms.Select(attrs={
             'class': INPUT_CLASS
         }),
-        initial=USER_TYPE_CHOICES[1],
-        
+        initial=USER_TYPE_CHOICES[0],
     )
 
     password1 = forms.CharField(
@@ -61,8 +144,4 @@ class SignUpForm(UserCreationForm):
         if commit:
             user.save()
             # Assign role-specific models
-            if self.cleaned_data["role"] == "shopper":
-                Shopper.objects.create(user=user)
-            else:
-                Seller.objects.create(user=user)
         return user

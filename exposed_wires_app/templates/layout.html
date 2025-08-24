@@ -26,7 +26,14 @@
                                 
 </head>
     <body class="bg-bg-100">
-        {% block header %}{% include 'includes/header.html' %}{% endblock %}
+        {% block header %}
+            {%if user.role == "seller"%}
+                {% include 'includes/seller_header.html' %}
+            {%else%}
+                {% include 'includes/shopper_header.html' %}
+            {%endif %}
+
+        {% endblock %}
         {% block content %}{% endblock %}
         {% block footer %}{% include 'includes/footer.html' %}{% endblock %}
 
