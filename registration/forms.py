@@ -9,7 +9,7 @@ from django import forms
 from exposed_wires_app.models import Shopper, Seller
 
 # Tailwind style class for inputs
-INPUT_CLASS = "w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-100"
+INPUT_CLASS = "w-full p-3 bg-bg-300 text-text-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-200"
 
 
 class ShopperForm(forms.ModelForm):
@@ -44,22 +44,14 @@ class ShopperForm(forms.ModelForm):
 
 
 class SellerForm(forms.ModelForm):
-    store_name = forms.CharField(
-        max_length=100,
-        required=True,
-        widget=forms.TextInput(attrs={
-            "placeholder": "Enter your store name",
+    store = forms.ModelChoiceField(
+        queryset=Store.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={
             "class": INPUT_CLASS
         })
     )
-    store_description = forms.CharField(
-        required=False,
-        widget=forms.Textarea(attrs={
-            "placeholder": "Describe your store",
-            "class": INPUT_CLASS,
-            "rows": 3
-        })
-    )
+
     city = forms.CharField(
         max_length=100,
         required=False,
@@ -68,6 +60,7 @@ class SellerForm(forms.ModelForm):
             "class": INPUT_CLASS
         })
     )
+
     phone = forms.CharField(
         max_length=20,
         required=False,
@@ -76,21 +69,19 @@ class SellerForm(forms.ModelForm):
             "class": INPUT_CLASS
         })
     )
+
     address = forms.CharField(
         required=False,
         widget=forms.Textarea(attrs={
             "placeholder": "Enter your address",
-            "class": INPUT_CLASS,
-            "rows": 3
+            "class": INPUT_CLASS + " h-24 resize-none"
         })
     )
 
     class Meta:
         model = Seller
-        fields = ["store_name", "store_description", "city", "phone", "address"]
-
+        fields = ["store", "city", "phone", "address"]
 class SignUpForm(UserCreationForm):
-    INPUT_CLASS = "w-full p-3 bg-bg-300 text-text-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-200"
     USER_TYPE_CHOICES = [
         ('shopper', 'Shopper'),
         ('seller', 'Seller'),

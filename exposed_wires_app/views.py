@@ -5,6 +5,7 @@ from .forms import *
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from .models import *
+from .decorators import *
                          
 def home(request):
     return render(request, 'index.html')
@@ -41,3 +42,23 @@ def category_detail(request, category_name):
         "category": category,
         "products": products
     })
+
+
+#seller section
+def seller_dashboard(request):
+    return render(request, 'sellers/dashboard.html')
+def add_product(request):
+    return render(request, "sellers/add_product.html")
+
+def manage_products(request):
+    context = {
+        'form':ProductForm()
+    }
+    return render(request, "sellers/manage_products.html",context)
+
+def manage_orders(request):
+    return render(request, "sellers/manage_orders.html")
+def reports(request):
+    return render(request, 'sellers/reports.html')
+def seller_account(request):
+    return render(request, "sellers/account.html")
