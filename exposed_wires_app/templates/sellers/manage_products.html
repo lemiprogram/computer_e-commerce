@@ -1,0 +1,89 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="max-w-6xl mx-auto p-6">
+
+  <!-- Page Title -->
+  <h1 class="text-3xl font-bold text-primary-100 mb-6">Manage Products</h1>
+  <p class="text-text-100 mb-6">View, edit, or remove your listed products.</p>
+
+  <!-- Add Product Button -->
+  <div class="mb-6">
+    <a href="{% url 'add_product' %}" 
+       class="bg-primary-100 text-white px-6 py-2 rounded-lg shadow hover:bg-primary-200">
+      + Add New Product
+    </a>
+  </div>
+
+  <!-- Product List -->
+  <div class="overflow-x-auto bg-bg-200 shadow-md rounded-2xl">
+    <table class="min-w-full text-left border-collapse">
+      <thead>
+        <tr class="bg-bg-300 text-text-100">
+          <th class="p-4">Image</th>
+          <th class="p-4">Name</th>
+          <th class="p-4">Category</th>
+          <th class="p-4">Price</th>
+          <th class="p-4">Stock</th>
+          <th class="p-4">Discount</th>
+          <th class="p-4">Date Added</th>
+          <th class="p-4">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200">
+        {% for product in products %}
+        <tr class="hover:bg-bg-300">
+          <!-- Product Image -->
+          <td class="p-4">
+            {% if product.image %}
+              <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-16 h-16 object-cover rounded-md shadow">
+            {% else %}
+              <div class="w-16 h-16 flex items-center justify-center bg-gray-200 rounded-md text-gray-500">
+                No Image
+              </div>
+            {% endif %}
+          </td>
+
+          <!-- Product Name -->
+          <td class="p-4 font-semibold text-text-100">{{ product.name }}</td>
+
+          <!-- Category -->
+          <td class="p-4">{{ product.category.name }}</td>
+
+          <!-- Price -->
+          <td class="p-4">${{ product.price }}</td>
+
+          <!-- Stock -->
+          <td class="p-4">{{ product.stock }}</td>
+
+          <!-- Discount -->
+          <td class="p-4">{{ product.deal }}%</td>
+
+          <!-- Date Added -->
+          <td class="p-4 text-sm text-gray-500">{{ product.created_at|date:"M d, Y" }}</td>
+
+          <!-- Actions -->
+          <td class="p-4 space-x-2">
+            <a href="{% url 'edit_product' product.id %}" 
+               class="bg-accent-100 text-text-100 px-3 py-1 rounded-lg shadow hover:bg-accent-200">
+              Edit
+            </a>
+            <a href="{% url 'delete_product' product.id %}" 
+               class="bg-red-500 text-white px-3 py-1 rounded-lg shadow hover:bg-red-600"
+               onclick="return confirm('Are you sure you want to delete this product?');">
+              Delete
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="8" class="text-center py-6 text-gray-500">
+            No products listed yet. <a href="{% url 'add_product' %}" class="text-primary-100 font-medium">Add one now</a>.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+{% endblock %}

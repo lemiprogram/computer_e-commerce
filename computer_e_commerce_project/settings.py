@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'exposed_wires_app',
     'registration',
     'api',
+    'user_admin',
     'rest_framework',
     'cloudinary',
 ]

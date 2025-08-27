@@ -1,0 +1,65 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="p-6 space-y-8">
+
+  <!-- Page Title -->
+  <h1 class="text-3xl font-bold text-primary-100 mb-4">My Wishlist</h1>
+  <p class="text-text-100 mb-6">Keep track of the products you love and may want to purchase later.</p>
+
+  <!-- Wishlist Table -->
+  <div class="bg-bg-200 p-6 rounded-2xl shadow-md">
+    <table class="w-full text-left border-collapse">
+      <thead>
+        <tr class="text-text-100 border-b border-gray-300">
+          <th class="p-3">Product</th>
+          <th class="p-3">Price</th>
+          <th class="p-3">Added On</th>
+          <th class="p-3">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in wishlist %}
+        <tr class="border-b border-gray-200">
+          <td class="p-3 flex items-center gap-3">
+            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="w-16 h-16 object-cover rounded-lg shadow">
+            <span>{{ item.product.name }}</span>
+          </td>
+          <td class="p-3">${{ item.product.price }}</td>
+          <td class="p-3">{{ item.added_at|date:"M d, Y" }}</td>
+          <td class="p-3 flex gap-2">
+            <!-- View Product -->
+            <a href="{% url 'product_detail' item.product.id %}" 
+               class="px-3 py-1 bg-primary-100 text-white rounded-lg shadow hover:bg-primary-200">
+               View
+            </a>
+            <!-- Add to Cart -->
+            <form action="{% url 'add_to_cart' item.product.id %}" method="post">
+              {% csrf_token %}
+              <button type="submit" 
+                      class="px-3 py-1 bg-green-500 text-white rounded-lg shadow hover:bg-green-600">
+                Add to Cart
+              </button>
+            </form>
+            <!-- Remove from Wishlist -->
+            <form action="{% url 'remove_from_wishlist' item.id %}" method="post">
+              {% csrf_token %}
+              <button type="submit" 
+                      class="px-3 py-1 bg-red-500 text-white rounded-lg shadow hover:bg-red-600">
+                Remove
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="4" class="p-6 text-center text-text-100">
+            Your wishlist is empty. Start adding products you like!
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+{% endblock %}

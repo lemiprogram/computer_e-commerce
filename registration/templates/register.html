@@ -4,36 +4,36 @@
 <div class="max-w-md mx-auto bg-bg-200 shadow-lg rounded-2xl p-8 my-10">
   <h2 class="text-2xl font-bold text-primary-200 mb-6 text-center">Sign Up</h2>
 
-  <form method="post" class="space-y-4">
+  <form method="post" class="space-y-4 " id="user_details">
     {% csrf_token %}
     {{ form.non_field_errors }}
 
     <div>
-      {{ form.username.label_tag }}  
+      <label class="text-text-100 capitalize" for="username">username</label>  
       {{ form.username }}
       {{ form.username.errors }}
     </div>
 
     <div>
-      {{ form.email.label_tag }}  
+      <label class="text-text-100 capitalize" for="email">email</label>  
       {{ form.email }}
       {{ form.email.errors }}
     </div>
 
     <div id="account_type">
-      <label class="font-semibold">Account Type:</label>
+      <label class="font-semibold text-text-100 capitalize">Account Type:</label>
       {{ form.role }}
-      {{ form.user_type.errors }}
+      {{ form.role.errors }}
     </div>
 
     <div>
-      {{ form.password1.label_tag }}
+      <label class="text-text-100 capitalize" for="password1">password1</label>
       {{ form.password1 }}
       {{ form.password1.errors }}
     </div>
 
     <div>
-      {{ form.password2.label_tag }}
+      <label class="text-text-100 capitalize" for="password2">password2</label>
       {{ form.password2 }}
       {{ form.password2.errors }}
     </div>
@@ -46,6 +46,13 @@
       </button>
     </div>
   </form>
+  <form method="post"class="space-y-4 hidden" id="seller_details">
+  </form>
+  <form method="post"class="space-y-4 hidden" id="shopper_details">
+  </form>
+  
+
+  
   <div class="mt-4 text-center">
         <p class="text-text-200 text-sm">Already have an account? <a href="/accounts/sign_in" class="text-primary-100 hover:text-primary-200">Login</a></p>
       </div>

@@ -33,6 +33,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
 
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='shopper')
+    
+    date_joined = models.DateField(auto_now=True)
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS = ["email"]
 

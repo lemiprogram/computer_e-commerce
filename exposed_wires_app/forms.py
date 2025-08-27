@@ -18,11 +18,7 @@ class ProductForm(forms.ModelForm):
         widget=forms.Select(attrs={"class": INPUT_CLASS})
     )
 
-    brand = forms.ModelChoiceField(
-        queryset=Brand.objects.all(),
-        required=False,
-        widget=forms.Select(attrs={"class": INPUT_CLASS})
-    )
+    brand = forms.CharField(max_length=200)
 
     name = forms.CharField(
         max_length=200,

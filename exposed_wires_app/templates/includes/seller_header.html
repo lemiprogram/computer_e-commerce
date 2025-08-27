@@ -1,0 +1,75 @@
+<nav class="bg-primary-100 shadow-lg sticky z-50 top-0 w-full">
+  <div class="p-4 max-w-7xl mx-auto flex items-center justify-between">
+    
+    <!-- Logo -->
+    <a href="{% url 'seller_dashboard'%}" class="text-white text-2xl font-bold font-serif">Exposed Wires</a>
+
+    <!-- Desktop Links -->
+    <div class="hidden md:flex space-x-6 items-center">
+      <a href="{% url 'seller_dashboard'%}" class="text-white hover:text-gray-300 cursor-pointer">Dashboard</a>
+      <a href="{% url 'manage_products' %}" class="text-white hover:text-gray-300 cursor-pointer">My Products</a>
+      <a href="{% url 'add_product' %}" class="text-white hover:text-gray-300 cursor-pointer">Add Product</a>
+      <a href="{% url 'manage_orders'%}" class="text-white hover:text-gray-300 cursor-pointer">Orders</a>
+      <a href="{% url 'reports'%}" class="text-white hover:text-gray-300 cursor-pointer">Reports</a>
+
+      <!-- Account -->
+      <a href="{% url 'seller_account' %}" >
+        <button id="seller-account-btn" class="text-white hover:text-gray-300 cursor-pointer ">
+          <svg xmlns="http://www.w3.org/2000/svg"
+               class="w-6 h-6 cursor-pointer" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 4 4zm0 2c-3.31 0-6 2.69-6 6h12c0-3.31-2.69-6-6-6z"/>
+          </svg>
+        </button>
+      </a>
+    </div>
+
+    <!-- Mobile Toggle -->
+    <div class="md:hidden flex items-center">
+      <button id="seller-menu-toggle" class="text-white focus:outline-none cursor-pointer">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" 
+             stroke="currentColor" class="w-7 h-7 cursor-pointer">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div id="seller-mobile-menu"
+       class="md:hidden max-h-0 overflow-hidden opacity-0 transform scale-95 transition-all duration-300 ease-in-out">
+    <a href="{% url 'seller_dashboard' %}" class="block font-bold p-4 text-white hover:text-text-100 hover:bg-accent-100 cursor-pointer">Dashboard</a>
+    <a href="{% url 'manage_products' %}" class="block font-bold p-4 text-white hover:text-text-100 hover:bg-accent-100 cursor-pointer">My Products</a>
+    <a href="{% url 'add_product' %}" class="block font-bold p-4 text-white hover:text-text-100 hover:bg-accent-100 cursor-pointer">Add Product</a>
+    <a href="{% url 'manage_orders' %}" class="block font-bold p-4 text-white hover:text-text-100 hover:bg-accent-100 cursor-pointer">Orders</a>
+    <a href="{% url 'reports' %}" class="block font-bold p-4 text-white hover:text-text-100 hover:bg-accent-100 cursor-pointer">Reports</a>
+    <a href="{% url 'seller_account' %}" id="seller-mobile-account-btn" class="block font-bold p-4 text-white hover:text-text-100 hover:bg-accent-100 cursor-pointer">
+      {% if user.is_authenticated %}
+        {{user.username}}
+      {%else%}
+        Account
+      {%endif%}
+    </a >
+  </div>
+</nav>
+
+<script>
+  const sellerMenuToggle = document.getElementById('seller-menu-toggle');
+  const sellerMobileMenu = document.getElementById('seller-mobile-menu');
+  const sellerAccountBtn = document.getElementById('seller-account-btn');
+  const sellerMobileAccountBtn = document.getElementById('seller-mobile-account-btn');
+
+  // Mobile menu toggle
+  sellerMenuToggle.addEventListener('click', () => {
+    sellerMobileMenu.classList.toggle('max-h-0');
+    sellerMobileMenu.classList.toggle('opacity-0');
+    sellerMobileMenu.classList.toggle('scale-95');
+    sellerMobileMenu.classList.toggle('max-h-screen');
+    sellerMobileMenu.classList.toggle('opacity-100');
+    sellerMobileMenu.classList.toggle('scale-100');
+  });
+
+  // Account button click (you can connect this with login/logout or seller account page)
+  
+</script>

@@ -1,0 +1,17 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="p-6">
+  <h1 class="text-2xl font-bold mb-6">Manage Shoppers</h1>
+  <ul>
+    {% for shopper in shoppers %}
+      <li class="flex justify-between items-center border-b py-2">
+        <span>{{ shopper.user.username }}</span>
+        <a href="{% url 'admin_shopper_delete' shopper.id %}" class="text-red-500 hover:underline">Delete</a>
+      </li>
+    {% empty %}
+      <li>No shoppers found.</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

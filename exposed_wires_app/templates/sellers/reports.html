@@ -1,0 +1,199 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="p-6 space-y-10">
+
+  <!-- Page Title -->
+  <h1 class="text-3xl font-bold text-primary-100 mb-4">Reports & Analytics</h1>
+  <p class="text-text-100 mb-8">Track your sales, performance, and customer insights in one place.</p>
+
+  <!-- Summary Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <div class="bg-bg-200 p-6 rounded-2xl shadow-md">
+      <h2 class="text-lg font-semibold text-text-100">Total Orders</h2>
+      <p class="text-3xl font-bold text-primary-100 mt-2">{{ total_orders }}</p>
+    </div>
+    <div class="bg-bg-200 p-6 rounded-2xl shadow-md">
+      <h2 class="text-lg font-semibold text-text-100">Revenue</h2>
+      <p class="text-3xl font-bold text-green-500 mt-2">${{ total_revenue }}</p>
+    </div>
+    <div class="bg-bg-200 p-6 rounded-2xl shadow-md">
+      <h2 class="text-lg font-semibold text-text-100">Average Order</h2>
+      <p class="text-3xl font-bold text-blue-500 mt-2">${{ avg_order_value }}</p>
+    </div>
+    <div class="bg-bg-200 p-6 rounded-2xl shadow-md">
+      <h2 class="text-lg font-semibold text-text-100">Pending Orders</h2>
+      <p class="text-3xl font-bold text-red-500 mt-2">{{ pending_orders }}</p>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="bg-bg-200 p-6 rounded-2xl shadow-md mt-8">
+    <h2 class="text-xl font-semibold text-primary-100 mb-4">Filter Reports</h2>
+    <form class="flex flex-wrap gap-4">
+      <div>
+        <label class="block text-sm mb-1 text-text-100">Date From</label>
+        <input type="date" class="p-2 rounded-lg bg-bg-300 text-text-100">
+      </div>
+      <div>
+        <label class="block text-sm mb-1 text-text-100">Date To</label>
+        <input type="date" class="p-2 rounded-lg bg-bg-300 text-text-100">
+      </div>
+      <div>
+        <label class="block text-sm mb-1 text-text-100">Status</label>
+        <select class="p-2 rounded-lg bg-bg-300 text-text-100">
+          <option>All</option>
+          <option>Pending</option>
+          <option>Shipped</option>
+          <option>Completed</option>
+        </select>
+      </div>
+      <div class="flex items-end">
+        <button type="submit" class="bg-primary-100 text-white px-4 py-2 rounded-lg shadow hover:bg-primary-200">Apply</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Best Selling Products -->
+  <div class="bg-bg-200 p-6 rounded-2xl shadow-md mt-8">
+    <h2 class="text-xl font-semibold text-primary-100 mb-4">Best-Selling Products</h2>
+    <table class="w-full text-left border-collapse">
+      <thead>
+        <tr class="text-text-100 border-b border-gray-300">
+          <th class="p-2">Product</th>
+          <th class="p-2">Units Sold</th>
+          <th class="p-2">Revenue</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for product in best_sellers %}
+        <tr class="border-b border-gray-200">
+          <td class="p-2">{{ product.name }}</td>
+          <td class="p-2">{{ product.units_sold }}</td>
+          <td class="p-2">${{ product.revenue }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="3" class="p-4 text-center text-text-100">No sales data available</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Top Customers -->
+  <div class="bg-bg-200 p-6 rounded-2xl shadow-md mt-8">
+    <h2 class="text-xl font-semibold text-primary-100 mb-4">Top Customers</h2>
+    <table class="w-full text-left border-collapse">
+      <thead>
+        <tr class="text-text-100 border-b border-gray-300">
+          <th class="p-2">Customer</th>
+          <th class="p-2">Orders</th>
+          <th class="p-2">Total Spent</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for customer in top_customers %}
+        <tr class="border-b border-gray-200">
+          <td class="p-2">{{ customer.name }}</td>
+          <td class="p-2">{{ customer.order_count }}</td>
+          <td class="p-2">${{ customer.total_spent }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="3" class="p-4 text-center text-text-100">No customer data available</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Charts Section -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+    <div class="bg-bg-200 p-6 rounded-2xl shadow-md">
+      <h2 class="text-xl font-semibold text-primary-100 mb-4">Sales Over Time</h2>
+      <canvas id="salesOverTime"></canvas>
+    </div>
+    <div class="bg-bg-200 p-6 rounded-2xl shadow-md">
+      <h2 class="text-xl font-semibold text-primary-100 mb-4">Orders by Status</h2>
+      <canvas id="ordersByStatus"></canvas>
+    </div>
+    <div class="bg-bg-200 p-6 rounded-2xl shadow-md">
+      <h2 class="text-xl font-semibold text-primary-100 mb-4">Revenue by Category</h2>
+      <canvas id="revenueByCategory"></canvas>
+    </div>
+    <div class="bg-bg-200 p-6 rounded-2xl shadow-md">
+      <h2 class="text-xl font-semibold text-primary-100 mb-4">Orders by City</h2>
+      <canvas id="ordersByCity"></canvas>
+    </div>
+  </div>
+
+
+
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Embed datasets -->
+<script id="datasets" type="application/json">
+  {{ datasets|safe }}
+</script>
+
+<script>
+  const datasets = JSON.parse(document.getElementById('datasets').textContent);
+
+  // Sales Over Time (Line Chart)
+  new Chart(document.getElementById('salesOverTime'), {
+    type: 'line',
+    data: {
+      labels: datasets.sales_dates,
+      datasets: [{
+        label: 'Sales ($)',
+        data: datasets.sales_totals,
+        borderColor: '#bb2649',
+        backgroundColor: 'rgba(187,38,73,0.2)',
+        fill: true,
+        tension: 0.3
+      }]
+    }
+  });
+
+  // Orders by Status (Doughnut)
+  new Chart(document.getElementById('ordersByStatus'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Pending', 'Shipped', 'Completed', 'Cancelled'],
+      datasets: [{
+        data: datasets.orders_status,
+        backgroundColor: ['#fbbf24','#3b82f6','#22c55e','#ef4444']
+      }]
+    }
+  });
+
+  // Revenue by Category (Bar)
+  new Chart(document.getElementById('revenueByCategory'), {
+    type: 'bar',
+    data: {
+      labels: datasets.category_names,
+      datasets: [{
+        label: 'Revenue ($)',
+        data: datasets.category_revenue,
+        backgroundColor: '#f35d74'
+      }]
+    }
+  });
+
+  // Orders by City (Horizontal Bar)
+  new Chart(document.getElementById('ordersByCity'), {
+    type: 'bar',
+    data: {
+      labels: datasets.city_names,
+      datasets: [{
+        label: 'Orders',
+        data: datasets.city_orders,
+        backgroundColor: '#22c55e'
+      }]
+    },
+    options: {
+      indexAxis: 'y'
+    }
+  });
+</script>
+
+{% endblock %}

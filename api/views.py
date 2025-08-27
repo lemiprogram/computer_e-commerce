@@ -5,7 +5,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
-from .models import Cart, CartItem, Product, Shopper
+from .models import Cart, CartItem
+from exposed_wires_app.models import Product, Shopper, Category
 from .serializers import CartSerializer
 
 
@@ -41,3 +42,7 @@ def remove_from_cart(request, product_id):
     cart = get_object_or_404(Cart, shopper=shopper)
     CartItem.objects.filter(cart=cart, product_id=product_id).delete()
     return Response({"detail": "Item removed from cart."}, status=status.HTTP_204_NO_CONTENT)
+def get_categories(request):
+    categories,_ = Category.objects.get_or_create()
+    
+    return categories

@@ -1,8 +1,7 @@
 
 from django.db import models
 from django.conf import settings
-from exposed_wires_app.models import Product  # assuming Product is in the same app
-from exposed_wires_app.models import Shopper
+from exposed_wires_app.models import Product, Shopper
 
 class Cart(models.Model):
     shopper = models.OneToOneField(
@@ -18,7 +17,6 @@ class Cart(models.Model):
     def __str__(self):
         return f"Cart ({self.shopper})"
 
-
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="items")
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -29,3 +27,21 @@ class CartItem(models.Model):
 
     def __str__(self):
         return f"{self.product.name} (x{self.quantity})"
+
+class Wishlist(models.Model):
+    shopper = models.ForeignKey(
+        Shopper, 
+        on_delete=models.CASCADE,
+        related_name="wishlist"
+    )
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name="wishlisted_in"
+    )
+    added_at = models.DateTimeField(auto_now_add=True)  
+    class Meta:
+        ordering = ["-added_at"]
+
+    def __str__(self):
+        return f"{self.user.username}'s Wishlist - {self.product.name}"

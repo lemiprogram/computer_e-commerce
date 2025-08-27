@@ -1,0 +1,66 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="p-6 space-y-8">
+
+  <!-- Page Title -->
+  <h1 class="text-3xl font-bold text-primary-100 mb-4">Hot Deals & Discounts</h1>
+  <p class="text-text-100 mb-6">Discover the best offers on your favorite products!</p>
+
+  <!-- Deals Grid -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for product in deals %}
+    <div class="bg-bg-200 rounded-2xl shadow-md p-4 hover:shadow-lg transition">
+      
+      <!-- Product Image -->
+      <div class="relative">
+        <img src="{{ product.image.url }}" alt="{{ product.name }}" 
+             class="w-full h-48 object-cover rounded-xl">
+        {% if product.deal > 0 %}
+        <span class="absolute top-2 left-2 bg-red-500 text-white text-sm font-bold px-2 py-1 rounded-lg shadow">
+          -{{ product.deal }}%
+        </span>
+        {% endif %}
+      </div>
+
+      <!-- Product Info -->
+      <div class="mt-4 space-y-2">
+        <h2 class="text-lg font-semibold text-text-100">{{ product.name }}</h2>
+        
+        <!-- Prices -->
+        <div class="flex items-center gap-2">
+          <span class="text-xl font-bold text-primary-100">
+            ${{ product.price|floatformat:2|add:"-"|yesno:"0,product.price" }}
+          </span>
+          {% if product.deal > 0 %}
+          {% with discounted=product.price|floatformat:2|floatformat:"2"|floatformat:"2" %}
+          <span class="line-through text-gray-400">${{ product.price }}</span>
+          <span class="text-green-600 font-semibold">
+            ${{ product.get_deal}}
+          </span>
+          {% endwith %}
+          {% endif %}
+        </div>
+
+        <!-- Actions -->
+        <div class="flex gap-2 mt-3">
+          <a href="{% url 'product_detail' product.id %}" 
+             class="px-3 py-2 bg-primary-100 text-white rounded-lg shadow hover:bg-primary-200">
+             View
+          </a>
+          <form action="{% url 'add_to_cart' product.id %}" method="post">
+            {% csrf_token %}
+            <button type="submit" 
+                    class="px-3 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600">
+              Add to Cart
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <p class="text-center text-text-100 col-span-3">No deals available at the moment. Check back later!</p>
+    {% endfor %}
+  </div>
+
+</div>
+{% endblock %}

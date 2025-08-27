@@ -1,0 +1,46 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="p-6">
+  <h1 class="text-2xl font-bold mb-6">Manage Conditions</h1>
+  <form action="{% url 'admin_condition_create' %}" method="post" enctype="multipart/form-data"
+      class="w-full max-w-md mx-auto bg-bg-200 rounded-2xl shadow-lg p-6 flex flex-col space-y-4">
+    {% csrf_token %}
+
+    <!-- Form Title -->
+    <h2 class="text-xl font-semibold text-text-100">Add New Condition</h2>
+
+    <!-- Condition Name -->
+    <div class="flex flex-col space-y-2">
+        <label class="text-sm font-medium text-text-200">Condition Name</label>
+        <input type="text" name="condition" placeholder="Enter Condition name"
+               class="p-3 bg-bg-300 text-text-100 rounded-lg border border-bg-300 
+                      focus:outline-none focus:ring-2 focus:ring-primary-200 transition">
+    </div>
+
+    <!-- Category Image -->
+    
+    <!-- Submit Button -->
+    <button type="submit"
+            class="mt-4 bg-primary-100 hover:bg-primary-200 text-white font-semibold 
+                   py-3 px-6 rounded-lg shadow-md transition">
+        Add Condition
+    </button>
+</form>
+  <div class="mt-6">
+    <ul>
+      {% for condition in conditions %}
+        <div class="max-w-xs bg-white shadow-lg rounded-2xl overflow-hidden hover:shadow-xl transition duration-300">
+          <div class="p-4 text-center flex justify-between">
+            <h3 class="text-lg font-semibold text-text-100">{{ condition.condition }}</h3>
+            <div class="flex justify-center"><a href="{% url 'admin_condition_delete' condition.id %}" class="text-red-500 hover:underline">Delete</a></div>
+          </div>
+        </div>
+
+      {% empty %}
+        <li>No conditions found.</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="p-6">
+  <h1 class="text-2xl font-bold mb-6">Manage Categories</h1>
+  <form action="{% url 'admin_category_create' %}" method="post" enctype="multipart/form-data"
+      class="w-full max-w-md mx-auto bg-bg-200 rounded-2xl shadow-lg p-6 flex flex-col space-y-4">
+    {% csrf_token %}
+
+    <!-- Form Title -->
+    <h2 class="text-xl font-semibold text-text-100">Add New Category</h2>
+
+    <!-- Category Name -->
+    <div class="flex flex-col space-y-2">
+        <label class="text-sm font-medium text-text-200">Category Name</label>
+        <input type="text" name="name" placeholder="Enter category name"
+               class="p-3 bg-bg-300 text-text-100 rounded-lg border border-bg-300 
+                      focus:outline-none focus:ring-2 focus:ring-primary-200 transition">
+    </div>
+
+    <!-- Category Image -->
+    <div class="flex flex-col space-y-2">
+        <label class="text-sm font-medium text-text-200">Category Image</label>
+        <input type="file" name="image"
+               class="file:mr-4 file:py-2 file:px-4 file:rounded-full 
+                      file:border-0 file:text-sm file:font-semibold 
+                      file:bg-primary-100 file:text-white 
+                      hover:file:bg-primary-200 transition cursor-pointer 
+                      text-text-100">
+    </div>
+
+    <!-- Submit Button -->
+    <button type="submit"
+            class="mt-4 bg-primary-100 hover:bg-primary-200 text-white font-semibold 
+                   py-3 px-6 rounded-lg shadow-md transition">
+        Add Category
+    </button>
+</form>
+
+  <div class="mt-6">
+    <div class="flex gap-5">
+      {% for category in categories %}
+        <div class="max-w-xs min-w-[200px] bg-white shadow-lg rounded-2xl overflow-hidden hover:shadow-xl transition duration-300">
+          <div class="h-40 w-full overflow-hidden">
+            <img src="{{ category.image.url }}" alt="{{ category.name }}" class="h-full w-full object-cover">
+          </div>
+          <div class="p-4 text-center">
+            <h3 class="text-lg font-semibold text-text-100">{{ category.name }}</h3>
+          </div>
+          <div class="flex justify-center"><a href="{% url 'admin_category_delete' category.id %}" class="text-red-500 hover:underline ">Delete</a></div>
+        </div>
+      {% empty %}
+        <li>No categories found.</li>
+      {% endfor %}
+      </div>
+  </div>
+</div>
+{% endblock %}

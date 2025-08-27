@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from .models import *
 from .decorators import *
-                         
+@redirect_admin             
 def home(request):
     return render(request, 'index.html')
 
@@ -21,7 +21,12 @@ def shop(request):
             context["role"] = "seller"
     else:
         context["role"] = "user"
-    return render(request, "shop.html", context)
+    return render(request, "shoppers/shop.html", context)
+def view_products(request):
+    page_number = request.GET.get('page','1')
+    query  = request.GET.get('p','')
+    products = Product.objects.filter(name__icontains=query)
+    return render()
 def account(request):
     context = {
         'user' : request.user,
@@ -33,17 +38,19 @@ def account(request):
 
 def category_list(request):
     categories = Category.objects.all()
-    return render(request, "category_list.html", {"categories": categories})
+    return render(request, "shoppers/category_list.html", {"categories": categories})
 
 def category_detail(request, category_name):
     category = get_object_or_404(Category, name=category_name)
     products = Product.objects.filter(category=category)
-    return render(request, "category_detail.html", {
+    return render(request, "shoppers/category_detail.html", {
         "category": category,
         "products": products
     })
-
-
+def wishlist(request):
+    return render(request, 'shoppers/wishlist.html')
+def deals(request):
+    return render(request, "shoppers/deals.html")
 #seller section
 def seller_dashboard(request):
     return render(request, 'sellers/dashboard.html')

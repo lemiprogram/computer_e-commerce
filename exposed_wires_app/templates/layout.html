@@ -7,17 +7,16 @@
         <link rel="stylesheet" href="{% static 'styles.css' %}">
         <style type="text/tailwindcss">      
             @theme {
-    --color-primary-100:#84725e;
-    --color-primary-200:#E7D1BB;
-    --color-primary-300:#c8b39e;
-    --color-accent-100:#A096A5;
-    --color-accent-200:#463e4b;
-    --color-text-100:#A096A2;
-    --color-text-200:#847a86;
-    --color-bg-100:#151931;
-    --color-bg-200:#252841;
-    --color-bg-300:#3d3f5b;
-      
+    --color-primary-100:#c21d03;
+    --color-primary-200:#fd5732;
+    --color-primary-300:#ffb787;
+    --color-accent-100:#393939;
+    --color-accent-200:#bebebe;
+    --color-text-100:#232121;
+    --color-text-200:#4b4848;
+    --color-bg-100:#fbfbfb;
+    --color-bg-200:#f1f1f1;
+    --color-bg-300:#c8c8c8;
       
     --color-faded-black:#000000a5;
                     
@@ -29,15 +28,22 @@
         {% block header %}
             {%if user.role == "seller"%}
                 {% include 'includes/seller_header.html' %}
-            {%else%}
+            {%elif user.role == "shopper"%}
                 {% include 'includes/shopper_header.html' %}
             {%endif %}
 
         {% endblock %}
-        {% block content %}{% endblock %}
-        {% block footer %}{% include 'includes/footer.html' %}{% endblock %}
-
-        
+        <main class="min-h-screen w-screen flex">
+            {%if user.role == "admin" %}
+                {% include 'includes/admin_sidbar.html'%}
+            {% endif %}
+            <section class="w-full">{% block content %}{% endblock %}</section>
+        </main>
+        {% block footer %}
+            {%if user.role != "admin"%}
+                {% include 'includes/footer.html' %}
+            {%endif%}
+        {% endblock %}
         <script src="{% static 'scripts.js' %}"></script>
                             
     </body>

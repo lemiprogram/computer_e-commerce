@@ -1,0 +1,125 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="min-h-screen bg-bg-100 p-8">
+  <!-- Dashboard Container -->
+  <div class="max-w-7xl mx-auto bg-bg-300 shadow-xl rounded-2xl p-8">
+    
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-10">
+      <h1 class="text-3xl font-bold text-primary-100">Seller Dashboard</h1>
+      <a href="{% url 'sign_out' %}" 
+         class="bg-accent-200 hover:bg-accent-100 text-white px-5 py-2 rounded-lg cursor-pointer">
+        Logout
+      </a>
+    </div>
+
+    <!-- Stats Overview -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+      <div class="bg-bg-200 p-6 rounded-xl text-center shadow">
+        <h2 class="text-lg font-semibold text-text-100">Total Products</h2>
+        <p class="text-3xl font-bold text-primary-100">{{ products_count }}</p>
+      </div>
+      <div class="bg-bg-200 p-6 rounded-xl text-center shadow">
+        <h2 class="text-lg font-semibold text-text-100">Orders</h2>
+        <p class="text-3xl font-bold text-primary-100">{{ orders_count }}</p>
+      </div>
+      <div class="bg-bg-200 p-6 rounded-xl text-center shadow">
+        <h2 class="text-lg font-semibold text-text-100">Revenue</h2>
+        <p class="text-3xl font-bold text-primary-100">${{ total_revenue }}</p>
+      </div>
+      <div class="bg-bg-200 p-6 rounded-xl text-center shadow">
+        <h2 class="text-lg font-semibold text-text-100">Pending Orders</h2>
+        <p class="text-3xl font-bold text-primary-100">{{ pending_orders }}</p>
+      </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+      <a href="{% url 'add_product' %}" class="bg-primary-100 hover:bg-primary-200 text-white p-6 rounded-xl shadow-lg text-center cursor-pointer">
+        ➕ Add Product
+      </a>
+      <a href="{% url 'manage_products' %}" class="bg-primary-200 hover:bg-primary-100 text-white p-6 rounded-xl shadow-lg text-center cursor-pointer">
+        📦 Manage Products
+      </a>
+      <a href="{% url 'manage_orders' %}" class="bg-accent-200 hover:bg-accent-100 text-white p-6 rounded-xl shadow-lg text-center cursor-pointer">
+        🛒 Manage Orders
+      </a>
+      <a href="{% url 'seller_account' %}" class="bg-bg-200 hover:bg-bg-100 text-text-100 p-6 rounded-xl shadow-lg text-center cursor-pointer">
+        ⚙️ Account Settings
+      </a>
+    </div>
+
+    <!-- Recent Orders -->
+    <div class="bg-bg-200 p-6 rounded-xl shadow mb-10">
+      <h2 class="text-xl font-bold text-text-100 mb-4">Recent Orders</h2>
+      <table class="w-full text-left">
+        <thead>
+          <tr class="border-b border-bg-300 text-text-200">
+            <th class="py-2">Order ID</th>
+            <th class="py-2">Product</th>
+            <th class="py-2">Quantity</th>
+            <th class="py-2">Status</th>
+            <th class="py-2">Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for order in recent_orders %}
+          <tr class="border-b border-bg-300">
+            <td class="py-2">#{{ order.id }}</td>
+            <td class="py-2">{{ order.product.name }}</td>
+            <td class="py-2">{{ order.quantity }}</td>
+            <td class="py-2">
+              <span class="px-3 py-1 rounded-lg text-white
+                {% if order.status == 'pending' %} bg-accent-200
+                {% elif order.status == 'completed' %} bg-primary-100
+                {% else %} bg-text-200 {% endif %}">
+                {{ order.status|capfirst }}
+              </span>
+            </td>
+            <td class="py-2">{{ order.created_at|date:"M d, Y" }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5" class="text-center py-4 text-text-200">No recent orders</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Top Products -->
+    <div class="bg-bg-200 p-6 rounded-xl shadow mb-10">
+      <h2 class="text-xl font-bold text-text-100 mb-4">Top Selling Products</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {% for product in top_products %}
+        <div class="bg-bg-300 rounded-lg shadow-lg p-4 text-center">
+          {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-40 object-cover rounded-md mb-4">
+          {% endif %}
+          <h3 class="font-semibold text-text-100">{{ product.name }}</h3>
+          <p class="text-text-200">${{ product.price }}</p>
+          <p class="text-primary-100 font-bold">{{ product.orders.count }} Orders</p>
+        </div>
+        {% empty %}
+        <p class="text-text-200">No top products available.</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Notifications -->
+    <div class="bg-bg-200 p-6 rounded-xl shadow">
+      <h2 class="text-xl font-bold text-text-100 mb-4">Notifications</h2>
+      <ul class="space-y-3">
+        {% for notification in notifications %}
+          <li class="p-3 bg-bg-300 rounded-lg shadow-sm text-text-200">
+            {{ notification }}
+          </li>
+        {% empty %}
+          <li class="text-text-200">No notifications at this time.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

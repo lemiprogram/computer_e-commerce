@@ -1,0 +1,92 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="p-6 space-y-10">
+
+  <!-- Page Title -->
+  <h1 class="text-3xl font-bold text-primary-100">Seller Account</h1>
+  <p class="text-text-100 mb-6">Manage your account details, store information, and security settings.</p>
+
+  <!-- Sections Grid -->
+  <div class="flex flex-wrap gap-6">
+      <!-- Profile Info -->
+      <section class="bg-bg-200 shadow-md rounded-2xl p-6 flex-1 min-w-[300px]">
+        <h2 class="text-xl font-semibold text-primary-100 mb-4">Profile Information</h2>
+        <div class="space-y-2">
+          <p><span class="font-bold">Username:</span> {{ seller.user.username }}</p>
+          <p><span class="font-bold">Email:</span> {{ seller.user.email }}</p>
+          <p><span class="font-bold">Phone:</span> {{ seller.phone }}</p>
+          <p><span class="font-bold">City:</span> {{ seller.city }}</p>
+          <p><span class="font-bold">Address:</span> {{ seller.address }}</p>
+        </div>
+        <div class="mt-4">
+          <a href="#" class="bg-primary-100 text-white px-4 py-2 rounded-lg shadow hover:bg-primary-200">Edit Profile</a>
+        </div>
+      </section>
+
+      <!-- Store Info -->
+      <section class="bg-bg-200 shadow-md rounded-2xl p-6 flex-1 min-w-[300px]">
+        <h2 class="text-xl font-semibold text-primary-100 mb-4">Store Information</h2>
+        <div class="space-y-2">
+          <p><span class="font-bold">Store Name:</span> {{ seller.store_name }}</p>
+          <p><span class="font-bold">Description:</span> {{ seller.store_description }}</p>
+          <p><span class="font-bold">Products Listed:</span> {{ seller.products.count }}</p>
+          <p><span class="font-bold">Orders Received:</span> {{ orders_count }}</p>
+        </div>
+        <div class="mt-4">
+          <a href="{% url 'manage_products' %}" class="bg-primary-100 text-white px-4 py-2 rounded-lg shadow hover:bg-accent-200">Manage Store</a>
+        </div>
+      </section>
+
+      <!-- Security Settings -->
+      <section class="bg-bg-200 shadow-md rounded-2xl p-6 flex-1 min-w-[300px]">
+        <h2 class="text-xl font-semibold text-primary-100 mb-4">Security Settings</h2>
+        <div class="space-y-2">
+          <p><span class="font-bold">Password:</span> ********</p>
+          <p><span class="font-bold">Last Login:</span> {{ seller.user.last_login }}</p>
+        </div>
+        <div class="mt-4 flex space-x-3">
+          <a href="#" class="bg-primary-100 text-white px-4 py-2 rounded-lg shadow hover:bg-primary-200">Change Password</a>
+          <a href="#" class="bg-red-500 text-white px-4 py-2 rounded-lg shadow hover:bg-red-600">Deactivate Account</a>
+        </div>
+      </section>
+
+      <!-- Preferences -->
+      <section class="bg-bg-200 shadow-md rounded-2xl p-6 flex-1 min-w-[300px]">
+        <h2 class="text-xl font-semibold text-primary-100 mb-4">Preferences</h2>
+        <form class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium mb-1 text-text-100">Email Notifications</label>
+            <select class="w-full p-2 rounded-lg bg-bg-300 text-text-100">
+              <option>Enabled</option>
+              <option>Disabled</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1 text-text-100">Dashboard Theme</label>
+            <select class="w-full p-2 rounded-lg bg-bg-300 text-text-100">
+              <option>Light</option>
+              <option>Dark</option>
+            </select>
+          </div>
+          <button type="submit" class="bg-primary-100 text-white px-4 py-2 rounded-lg shadow hover:bg-primary-200">Save Preferences</button>
+        </form>
+      </section>
+
+      <!-- New Section: Recent Activity -->
+      <section class="bg-bg-200 shadow-md rounded-2xl p-6 flex-1 min-w-[300px]">
+        <h2 class="text-xl font-semibold text-primary-100 mb-4">Recent Activity</h2>
+        <ul class="space-y-3 text-text-100">
+          <li>🛒 New order placed for <span class="font-bold">Product A</span> – 2 hours ago</li>
+          <li>📦 Product <span class="font-bold">"Wireless Headphones"</span> updated – Yesterday</li>
+          <li>🔑 Password changed – 2 days ago</li>
+          <li>📊 Viewed monthly sales report – 3 days ago</li>
+          <li>✅ Account verified – 1 week ago</li>
+        </ul>
+        <div class="mt-4">
+          <a href="{% url 'reports' %}" class="bg-primary-100 text-white px-4 py-2 rounded-lg shadow hover:bg-primary-200">View All Activity</a>
+        </div>
+      </section>
+  </div>
+
+</div>
+{% endblock %}
