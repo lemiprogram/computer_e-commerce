@@ -28,7 +28,7 @@
         {% block header %}
             {%if user.role == "seller"%}
                 {% include 'includes/seller_header.html' %}
-            {%elif user.role == "shopper"%}
+            {%elif user.role != "admin"%}
                 {% include 'includes/shopper_header.html' %}
             {%endif %}
 

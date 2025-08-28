@@ -3,9 +3,10 @@ from django.shortcuts import render,redirect,get_object_or_404
 from django.http import HttpResponse
 from .forms import *
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User
+from registration.models import CustomUser
 from .models import *
 from .decorators import *
+from django.contrib import messages
 @redirect_admin             
 def home(request):
     return render(request, 'index.html')
@@ -55,11 +56,26 @@ def deals(request):
 def seller_dashboard(request):
     return render(request, 'sellers/dashboard.html')
 def add_product(request):
-    return render(request, "sellers/add_product.html")
+    if request.method == "POST":
+        form = ProductForm(request.POST, request.FILES)
+        if form.is_valid():
+            product = form.save(commit=False)
+            product.seller = request.user.seller_profile
+            product.save()
+            messages.success(request, "Product added successfully!")
+            return redirect("manage_products")  
+    else:
+        form = ProductForm()
 
+    return render(request, "sellers/add_product.html", {"form": form})
 def manage_products(request):
+    
+
+    user = request.user 
+    seller = Seller.objects.get(user=user)
+    products = Product.objects.filter(seller=seller)
     context = {
-        'form':ProductForm()
+        'products':products
     }
     return render(request, "sellers/manage_products.html",context)
 

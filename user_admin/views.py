@@ -3,12 +3,17 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from .decorators import admin_required
 from .forms import CategoryForm, ConditionForm
-from exposed_wires_app.models import Category, Condition
+from exposed_wires_app.models import Category, Condition, Seller, Shopper,Store
 
 @login_required
 @admin_required
 def admin_dashboard(request):
-    return render(request, "dashboard.html")
+    context = {
+        'sellers_count':Seller.objects.count(),
+        'shoppers_count':Shopper.objects.count(),
+        'stores_count':Store.objects.count(),
+    }
+    return render(request, "dashboard.html",context)
 
 @login_required
 @admin_required
@@ -29,12 +34,18 @@ def admin_condition_list(request):
 @login_required
 @admin_required
 def admin_seller_list(request):
-    return render(request, "seller_list.html")
+    context = {
+        'sellers': Seller.objects.all()
+    }
+    return render(request, "seller_list.html",context)
 
 @login_required
 @admin_required
 def admin_shopper_list(request):
-    return render(request, "shopper_list.html")
+    context = {
+        'shoppers': Shopper.objects.all()
+    }
+    return render(request, "shopper_list.html",context)
 
 @login_required
 @admin_required

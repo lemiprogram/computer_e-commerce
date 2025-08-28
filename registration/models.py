@@ -42,3 +42,15 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.username or self.email
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+
+        # Import inside method to avoid circular import
+        from exposed_wires_app.models import Seller,Shopper
+
+        if is_new:
+            if self.role == "shopper":
+                Shopper.objects.create(user = self)
+            if self.role == "seller":
+                Seller.objects.create(user = self)
