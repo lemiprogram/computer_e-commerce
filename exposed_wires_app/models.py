@@ -164,3 +164,7 @@ class Wishlist(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s Wishlist - {self.product.name}"
+class  Filter(models.Model):
+    category = models.ForeignKey(Category)
+    key = models.CharField(max_length=32, null=True)
+    value = models.CharField(max_length=32, null=True)

@@ -9,42 +9,48 @@
     </h2>
 
     <!-- Product Grid -->
-    <div id="shop_product_grid" class="flex overflow-x-scroll w-full p-2">
+    <div id="shop_product_grid" class="flex flex-col w-full p-2">
+      
     </div>
   </div>
 </section>
 {%endblock%}
 {%block scripts%}
 <script>
-  function shop_products(data){
+  async function shop_products(){
     const shopPorductGrid = document.getElementById('shop_product_grid')
-    if(!data){
-      shopPorductGrid.innerHTML = `<p class="col-span-full text-center text-text-200">No products available.</p>`
-      return
-    }
+    let products = await get_data(get_Products_all_url)
+    let categories = await get_data(get_Categories_all_url)
+    for (let category of categories){
+      category_product_grid = document.createElement('div')
+      category_product_grid.classList.add('flex','flex-col','shadow-lg')
+      category_product_grid.innerHTML = `<div class="flex justify-between items-center py-2 px-4 bg-primary-100">
+        <p class="text-3xl capitalize font-bold text-white">${category.name} <span class="text-xl">Options</span></p>
+        <a href="categories/${category.name}/" class="text-lg hover:text-xl text-white">See all</a>
+      </div>`
+    category_products = products.filter(product=>product.category == category.id)
+    category_product_card_holder = document.createElement('div')
+    category_product_card_holder.classList.add('flex','overflow-x-scroll','overflow-y-none','px-3','py-5')
     
-      shopPorductGrid.innerHTML = data.map(product=>`
-            <div class="relative bg-bg-200 min-w-[230px] max-h-[280px] rounded-2xl shadow-lg flex flex-col items-center transition-transform transform hover:scale-105">
+    category_product_card_holder.innerHTML += category_products.map((product, index)=>index<10?`
+            <a href='' class="relative cursor-pointer bg-bg-200 min-w-[230px] max-h-[280px] rounded-2xl shadow-lg items-center transition-transform transform hover:scale-105">
             ${product.discount ? '<span class="absolute top-0 right-0 p-1 bg-primary-300 text-accent-100 rounded-es-lg rounded-se-lg">-'+product.discount+'%</span>':""}
             <!-- Product Image -->
             <img src="${product.image.url}" alt="${product.name}" class="h-48 w-full object-cover rounded-lg mb-4">
 
             <!-- Product Info -->
-            <h3 class="text-md font-semibold text-text-100 mb-2">${ product.name }</h3>
-            <span class="text-sm ${product.discount ? ' line-through decoration-2 decoration-text-100': ''} font-bold text-text-200 mb-4">$${product.price}</span>
-            ${product.discount?'<span class="text-lg font-bold text-primary-300 ">$'+getPrice(product.price,product.discount)+'</span>':''}
-            <!-- Add to Cart -->
-            <button type="submit"
-                    class="bg-primary-100 hover:bg-accent-200 
-                          text-white cursor-pointer font-semibold px-6 py-2 rounded-lg shadow-md 
-                          transition-all">
-              Add to Cart
-            </button>
-            
-          </div>
-        `).join('')
+            <div class=" w-full">
+              <h3 class="text-md font-semibold text-text-100 mb-2">${ product.name }</h3>
+              <span class="text-sm ${product.discount ? ' line-through decoration-2 decoration-text-100': ''} font-bold text-text-200 mb-4">$${product.price}</span>
+              ${product.discount?'<span class="text-lg font-bold text-primary-300 ">$'+getPrice(product.price,product.discount)+'</span>':''}
+              
+            </div>
+          </a>
+        `:'').join('')
+    category_product_grid.appendChild(category_product_card_holder)
+    shopPorductGrid.appendChild(category_product_grid)
+      }
     }
-  
-  get_products(shop_products)
-</script>
+    shop_products()
+  </script>
 {% endblock  %}
