@@ -86,18 +86,17 @@ class Product(models.Model):
     image = CloudinaryField("image", blank=True, null=True)
     discount = models.IntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(100)],
-        default=0
+        default=0,
+        null=True
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ["-created_at"]
 
+
     def __str__(self):
         return self.name
-
-    def get_deal(self):
-        return round(self.price - (self.price * (self.discount / 100)), 2)
 
 
 class Order(models.Model):

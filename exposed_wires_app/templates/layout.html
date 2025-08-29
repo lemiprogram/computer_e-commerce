@@ -33,7 +33,7 @@
             {%endif %}
 
         {% endblock %}
-        <main class="min-h-screen w-screen flex">
+        <main class="min-h-screen w-screen flex ">
             {%if user.role == "admin" %}
                 {% include 'includes/admin_sidbar.html'%}
             {% endif %}
@@ -44,29 +44,8 @@
                 {% include 'includes/footer.html' %}
             {%endif%}
         {% endblock %}
-        <script>
-           async function get_data(url){
-                return  await fetch(url)
-                        .then(res=>res.json())
-                        .then(data=>data)
-            }
-           async function post_data(url,postData){
-                return  await fetch(url,{
-                    method:'POST',
-                    headers:{
-                        'Content-Type':'application/json'
-                    },
-                    body:JSON.stringify(postData)
-                })
-                        .then(res=>res.json())
-                        .then(data=>data)
-            }
-
-            async function get_products(my_func){
-                data = await get_data("http://127.0.0.1:8000/api/products/get")
-                my_func(data)
-            }
-        </script>
+        <script src="{% static 'scripts.js' %}"></script>
+        {%block scripts%}{%endblock%}
                             
     </body>
 
