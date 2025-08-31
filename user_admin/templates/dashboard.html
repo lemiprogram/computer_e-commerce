@@ -1,14 +1,15 @@
 {% extends 'layout.html' %}
 
 {% block admin_content %}
-<!-- Main Dashboard -->
 <div class="flex-1 p-8 bg-bg-100 min-h-screen">
+  <!-- Title -->
   <h1 class="text-3xl font-bold text-primary-100 mb-6">Admin Dashboard</h1>
 
-  <!-- Admin Info Card -->
-  <div class="p-6 bg-white rounded-xl shadow-lg flex items-center gap-4 mb-8  capitalize text-3xl">
-    {{user.username|first}}
-    
+  <!-- Admin Info -->
+  <div class="p-6 bg-white rounded-xl shadow-lg flex items-center gap-4 mb-8">
+    <div class="w-16 h-16 rounded-full bg-primary-200 text-white flex items-center justify-center text-xl font-bold">
+      {{ user.username|first }}
+    </div>
     <div>
       <h2 class="text-xl font-semibold text-text-100">{{ user.username }}</h2>
       <p class="text-sm text-text-200">{{ user.email }}</p>
@@ -16,23 +17,102 @@
     </div>
   </div>
 
-  <!-- Summary Cards -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+  <!-- Summary Cards (populated via API) -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8" id="summary-cards">
+    <!-- JS will fill here -->
+  </div>
+
+  <!-- Data Sections -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- Newest Sellers -->
+    <div class="p-6 bg-white rounded-xl shadow-lg">
+      <h3 class="text-lg font-semibold text-text-100 mb-4">Newest Sellers</h3>
+      <ul id="Newest-sellers" class="space-y-2 text-text-200 text-sm"></ul>
+    </div>
+
+    <!-- Newest Shoppers -->
+    <div class="p-6 bg-white rounded-xl shadow-lg">
+      <h3 class="text-lg font-semibold text-text-100 mb-4">Newest Shoppers</h3>
+      <ul id="Newest-shoppers" class="space-y-2 text-text-200 text-sm"></ul>
+    </div>
+
+    <!-- Newest Stores -->
+    <div class="p-6 bg-white rounded-xl shadow-lg lg:col-span-2">
+      <h3 class="text-lg font-semibold text-text-100 mb-4">Newest Stores</h3>
+      <ul id="Newest-stores" class="grid grid-cols-1 md:grid-cols-2 gap-4"></ul>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  async function loadDashboard() {
+    // Fetch data
+    const sellers = await get_data(get_Sellers_url+'0');
+    const shoppers = await get_data(get_Shoppers_url+'0');
+    const stores = await get_data(get_Stores_url+'0');
+    const products = await get_data(get_Products_url+'0');
+    const orders = await get_data(get_Orders_url+'0');      
+    const users = await get_data(get_CustomUser_url+'0')
+  console.log(sellers)
+  // === SUMMARY CARDS ===
+  document.getElementById("summary-cards").innerHTML = `
     <div class="p-6 bg-white rounded-xl shadow-lg flex flex-col">
       <h3 class="text-lg font-semibold text-text-200">Total Sellers</h3>
-      <p class="text-3xl font-bold text-primary-100">{{ sellers_count }}</p>
+      <p class="text-3xl font-bold text-primary-100">${sellers.length}</p>
     </div>
     <div class="p-6 bg-white rounded-xl shadow-lg flex flex-col">
       <h3 class="text-lg font-semibold text-text-200">Total Shoppers</h3>
-      <p class="text-3xl font-bold text-primary-100">{{ shoppers_count }}</p>
+      <p class="text-3xl font-bold text-primary-100">${shoppers.length}</p>
     </div>
     <div class="p-6 bg-white rounded-xl shadow-lg flex flex-col">
       <h3 class="text-lg font-semibold text-text-200">Total Stores</h3>
-      <p class="text-3xl font-bold text-primary-100">{{ stores_count }}</p>
+      <p class="text-3xl font-bold text-primary-100">${stores.length}</p>
     </div>
-  </div>
+    <div class="p-6 bg-white rounded-xl shadow-lg flex flex-col">
+      <h3 class="text-lg font-semibold text-text-200">Total Products</h3>
+      <p class="text-3xl font-bold text-primary-100">${products.length}</p>
+    </div>
+    <div class="p-6 bg-white rounded-xl shadow-lg flex flex-col">
+      <h3 class="text-lg font-semibold text-text-200">Total Orders</h3>
+      <p class="text-3xl font-bold text-primary-100">${orders.length}</p>
+    </div>
+  `;
 
-  <!-- Recent Activity -->
+  // === Newest SELLERS ===
+  for (let shopper of shoppers.slice(-5)){
+    user = await get_data(get_CustomUser_url+shopper.user)
+    document.getElementById("Newest-sellers").innerHTML +=`
+    <li class="flex justify-between">
+      <span>${user.username}</span>
+      <span class="text-xs text-text-200">${user.email}</span>
+    </li>
+    `
+  }
+  for (let seller of sellers.slice(-5)){
+    user = await get_data(get_CustomUser_url+seller.user)
+    document.getElementById("Newest-sellers").innerHTML +=`
+    <li class="flex justify-between">
+      <span>${user.username}</span>
+      <span class="text-xs text-text-200">${user.email}</span>
+    </li>
+    `
+  }
 
-</div>
+ 
+  // === Newest STORES ===
+  document.getElementById("Newest-stores").innerHTML = stores.slice(-4).map(store => `
+    <li class="p-4 border rounded-lg flex items-center gap-3">
+      <img src="${store.image || '/static/images/store-placeholder.png'}" class="w-12 h-12 object-cover rounded-lg">
+      <div>
+        <h4 class="font-semibold text-text-100">${store.name}</h4>
+        <p class="text-xs text-text-200">Owner: ${store.seller.user.username}</p>
+      </div>
+    </li>
+  `).join("");
+}
+
+loadDashboard();
+</script>
 {% endblock %}

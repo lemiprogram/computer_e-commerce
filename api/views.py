@@ -19,6 +19,7 @@ MY_MODELS = {
     'Carts':[Cart,CartSerializer],
     'CartItems':[CartItem,CartItemSerializer],
     'Wishlists':[Wishlist,WishlistSerializer],
+    'Customusers':[CustomUser,CustomUserSerializer],
 }
 
 @api_view(['GET'])
@@ -30,15 +31,30 @@ def get_model(request,model,pk):
     return Response(serializer.data)
 @api_view(['GET'])
 def get_user(request):
-    serializer = UserSerializer(request.user)
+    serializer = CustomUserSerializer(request.user)
     return Response(serializer.data )
 
 @api_view(['GET'])
-def get_model_by_page(request,model,page_amount):
-    my_model,my_serializer = MY_MODELS[model.title()]
-    page_no = request.GET.get('page')
-    page_no = page_no if page_no else 1
-    paginator = Paginator(my_model.objects.all(),page_amount)
-    page_results = paginator.get_page(page_no)
+def get_model_by_page(request, model, page_amount):
+    my_model, my_serializer = MY_MODELS[model.title()]
+
+    page_no = request.GET.get('page', 1)  # default to page 1
+    paginator = Paginator(my_model.objects.all(), page_amount)
+
+    try:
+        page_results = paginator.page(page_no)
+    except:
+        return Response({
+            "error": "Invalid page number"
+        }, status=status.HTTP_400_BAD_REQUEST)
+
     serializer = my_serializer(page_results, many=True)
-    return Response(serializer.data)
+
+    return Response({
+        "results_count": paginator.count,                
+        "num_pages": paginator.num_pages,        
+        "current_page": page_results.number,      
+        "has_next": page_results.has_next(),      
+        "has_previous": page_results.has_previous(),  
+        "results": serializer.data               
+    })

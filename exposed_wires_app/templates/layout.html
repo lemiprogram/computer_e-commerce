@@ -1,98 +1,107 @@
 {% load static %}
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>{%block title%} Exposed Wires{%endblock%}</title>
-        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-        <style type="text/tailwindcss">      
-            @theme {
-    --color-primary-100:#c21d03;
-    --color-primary-200:#fd5732;
-    --color-primary-300:#ffb787;
-    --color-accent-100:#393939;
-    --color-accent-200:#bebebe;
-    --color-text-100:#232121;
-    --color-text-200:#4b4848;
-    --color-bg-100:#fbfbfb;
-    --color-bg-200:#f1f1f1;
-    --color-bg-300:#c8c8c8;
-      
-    --color-faded-black:#000000a5;
-    --color-faded-grey:#00000005;
-                    
-                }    
-        </style>
-                                
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %} Exposed Wires {% endblock %}</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">      
+        @theme {
+            --color-primary-100:#c21d03;
+            --color-primary-200:#fd5732;
+            --color-primary-300:#ffb787;
+            --color-accent-100:#393939;
+            --color-accent-200:#bebebe;
+            --color-text-100:#232121;
+            --color-text-200:#4b4848;
+            --color-bg-100:#fbfbfb;
+            --color-bg-200:#f1f1f1;
+            --color-bg-300:#c8c8c8;
+            --color-faded-black:#000000a5;
+            --color-faded-grey:#00000005;
+        }    
+
+        @layer base {
+            body {
+                @apply text-text-100 bg-bg-100;
+            }
+        }
+    </style>
 </head>
-    <body class="bg-bg-100">
-        {%if messages.success %}
-            <div class="abosolute bg-accent-200 text-green-300">{{messages.success}}</div>
-        {%elif messages.error%}
-            <div class="abosolute bg-accent-200 text-red-300">{{messages.error}}</div>
-        {%endif%}
-        {% block header %}
-            {%if user.role == "seller"%}
-                {% include 'includes/seller_header.html' %}
-            {%elif user.role != "admin"%}
-                {% include 'includes/shopper_header.html' %}
-            {%endif %}
+<body class="bg-bg-100">
 
-        {% endblock %}
-        <main class="min-h-screen w-screen flex">
-            {%if user.role == "admin" %}
-                {% include 'includes/admin_sidbar.html'%}
-                <section class="w-full h-screen overflow-y-scroll">{% block admin_content %}{% endblock %}</section>
-            {% endif %}
-            {% block content %}{% endblock %}
-        </main>
-        {% block footer %}
-            {%if user.role != "admin"%}
-                {% include 'includes/footer.html' %}
-            {%endif%}
-        {% endblock %}
-        <script>
-            async function get_data(url){
-    return  await fetch(url)
-            .then(res=>res.json())
-            .then(data=>data)
-}
-async function post_data(url,postData){
-    return  await fetch(url,{
-        method:'POST',
-        headers:{
-            'Content-Type':'application/json'
-        },
-        body:JSON.stringify(postData)
-    })
-            .then(res=>res.json())
-            .then(data=>data)
-}
-const BASE_URL = window.location.origin;
-const get_Categories_url = `${BASE_URL}/api/get/Categories/`
-const get_Conditions_url = `${BASE_URL}/api/get/Conditions/`
-const get_Stores_url = `${BASE_URL}/api/get/Stores/`
-const get_Shoppers_url = `${BASE_URL}/api/get/Shoppers/`
-const get_Sellers_url = `${BASE_URL}/api/get/Sellers/`
-const get_Products_url = `${BASE_URL}/api/get/Products/`
-const get_Orders_url = `${BASE_URL}/api/get/Orders/`
-const get_Carts_url = `${BASE_URL}/api/get/Carts/`
-const get_CartItems_url = `${BASE_URL}/api/get/CartItems/`
-const get_Wishlists_url = `${BASE_URL}/api/get/Wishlists/`
-const get_User_url = `${BASE_URL}/api/get/user/`
+    {% if messages %}
+        <div class="absolute top-4 right-4 space-y-2">
+            {% for message in messages %}
+                <div class="px-4 py-2 rounded-lg shadow text-white
+                            {% if message.tags == 'success' %} bg-green-500 
+                            {% elif message.tags == 'error' %} bg-red-500 
+                            {% else %} bg-accent-200 {% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
 
+    {% block header %}
+        {% if user.role == "seller" %}
+            {% include 'includes/seller_header.html' %}
+        {% elif user.role != "admin" %}
+            {% include 'includes/shopper_header.html' %}
+        {% endif %}
+    {% endblock %}
 
-function getPrice(priceStr,discount){
-    price = parseFloat(priceStr)
-    return price * (1-(discount /100))
-}
+    <main class="min-h-screen w-screen flex">
+        {% if user.role == "admin" %}
+            {% include 'includes/admin_sidbar.html' %}
+            <section class="w-full h-screen overflow-y-scroll">{% block admin_content %}{% endblock %}</section>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
 
+    {% block footer %}
+        {% if user.role != "admin" %}
+            {% include 'includes/footer.html' %}
+        {% endif %}
+    {% endblock %}
 
+    <script>
+        async function get_data(url){
+            return await fetch(url)
+                .then(res => res.json())
+                .then(data => data)
+        }
 
+        async function post_data(url, postData){
+            return await fetch(url, {
+                method:'POST',
+                headers:{ 'Content-Type':'application/json' },
+                body:JSON.stringify(postData)
+            })
+            .then(res => res.json())
+            .then(data => data)
+        }
 
-        </script>
-        {%block scripts%}{%endblock%}
-                            
-    </body>
+        const BASE_URL = window.location.origin;
 
-</html>    
-                            
+        const get_Categories_url = `${BASE_URL}/api/get/Categories/`;
+        const get_Conditions_url = `${BASE_URL}/api/get/Conditions/`;
+        const get_Stores_url = `${BASE_URL}/api/get/Stores/`;
+        const get_Shoppers_url = `${BASE_URL}/api/get/Shoppers/`;
+        const get_Sellers_url = `${BASE_URL}/api/get/Sellers/`;
+        const get_Products_url = `${BASE_URL}/api/get/Products/`;
+        const get_Orders_url = `${BASE_URL}/api/get/Orders/`;
+        const get_Carts_url = `${BASE_URL}/api/get/Carts/`;
+        const get_CartItems_url = `${BASE_URL}/api/get/CartItems/`;
+        const get_Wishlists_url = `${BASE_URL}/api/get/Wishlists/`;
+        const get_CustomUser_url = `${BASE_URL}/api/get/CustomUsers/`;
+        const get_User_url = `${BASE_URL}/api/get/user/`;
+
+        function getPrice(priceStr, discount){
+            price = parseFloat(priceStr)
+            return price * (1 - (discount / 100))
+        }
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>
