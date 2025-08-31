@@ -16,5 +16,6 @@ urlpatterns = [
     path("orders/", manage_orders, name="manage_orders"),
     path("reports/", reports, name="reports"),
     path("seller/acccount/", seller_account, name="seller_account"),
+    path("seller/store/", seller_store, name="seller_store"),
 ]
                         

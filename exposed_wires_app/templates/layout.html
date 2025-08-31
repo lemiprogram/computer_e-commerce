@@ -18,12 +18,18 @@
     --color-bg-300:#c8c8c8;
       
     --color-faded-black:#000000a5;
+    --color-faded-grey:#00000005;
                     
                 }    
         </style>
                                 
 </head>
     <body class="bg-bg-100">
+        {%if messages.success %}
+            <div class="abosolute bg-accent-200 text-green-300">{{messages.success}}</div>
+        {%elif messages.error%}
+            <div class="abosolute bg-accent-200 text-red-300">{{messages.error}}</div>
+        {%endif%}
         {% block header %}
             {%if user.role == "seller"%}
                 {% include 'includes/seller_header.html' %}
@@ -32,7 +38,7 @@
             {%endif %}
 
         {% endblock %}
-        <main class="min-h-screen w-screen flex ">
+        <main class="min-h-screen w-screen  ">
             {%if user.role == "admin" %}
                 {% include 'includes/admin_sidbar.html'%}
             {% endif %}
@@ -61,16 +67,17 @@ async function post_data(url,postData){
             .then(data=>data)
 }
 
-const get_Categories_all_url = "http://127.0.0.1:8000/api/get_Categories/all"
-const get_Conditions_all_url = "http://127.0.0.1:8000/api/get_Conditions/all"
-const get_Stores_all_url = "http://127.0.0.1:8000/api/get_Stores/all"
-const get_Shoppers_all_url = "http://127.0.0.1:8000/api/get_Shoppers/all"
-const get_Sellers_all_url = "http://127.0.0.1:8000/api/get_Sellers/all"
-const get_Products_all_url = "http://127.0.0.1:8000/api/get_Products/all"
-const get_Orders_all_url = "http://127.0.0.1:8000/api/get_Orders/all"
-const get_Carts_all_url = "http://127.0.0.1:8000/api/get_Carts/all"
-const get_CartItems_all_url = "http://127.0.0.1:8000/api/get_CartItems/all"
-const get_Wishlists_all_url = "http://127.0.0.1:8000/api/get_Wishlists/all"
+const get_Categories_url = "http://127.0.0.1:8000/api/get/Categories/"
+const get_Conditions_url = "http://127.0.0.1:8000/api/get/Conditions/"
+const get_Stores_url = "http://127.0.0.1:8000/api/get/Stores/"
+const get_Shoppers_url = "http://127.0.0.1:8000/api/get/Shoppers/"
+const get_Sellers_url = "http://127.0.0.1:8000/api/get/Sellers/"
+const get_Products_url = "http://127.0.0.1:8000/api/get/Products/"
+const get_Orders_url = "http://127.0.0.1:8000/api/get/Orders/"
+const get_Carts_url = "http://127.0.0.1:8000/api/get/Carts/"
+const get_CartItems_url = "http://127.0.0.1:8000/api/get/CartItems/"
+const get_Wishlists_url = "http://127.0.0.1:8000/api/get/Wishlists/"
+const get_User_url = "http://127.0.0.1:8000/api/get/user/"
 
 
 function getPrice(priceStr,discount){

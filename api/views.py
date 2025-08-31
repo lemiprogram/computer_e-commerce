@@ -7,54 +7,38 @@ from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from exposed_wires_app.models import *
 from .serializers import *
+from django.core.paginator import Paginator
+MY_MODELS = {
+    'Categories':[Category,CategorySerializer],
+    'Conditions':[Condition,ConditionSerializer],
+    'Stores':[Store,StoreSerializer],
+    'Shoppers':[Shopper,ShopperSerializer],
+    'Sellers':[Seller,SellerSerializer],
+    'Products':[Product,ProductSerializer],
+    'Orders':[Order,OrderSerializer],
+    'Carts':[Cart,CartSerializer],
+    'CartItems':[CartItem,CartItemSerializer],
+    'Wishlists':[Wishlist,WishlistSerializer],
+}
 
 @api_view(['GET'])
-def get_Categories(request):
-    all_Category = Category.objects.all()
-    serializer = CategorySerializer(all_Category, many=True)
+def get_model(request,model,pk):
+    my_model,my_serializer = MY_MODELS[model.title()]
+    all_models = my_model.objects.get(pk=pk) if pk else my_model.objects.all()
+
+    serializer = my_serializer(all_models) if pk else my_serializer(all_models, many=True)
     return Response(serializer.data)
 @api_view(['GET'])
-def get_Conditions(request):
-    all_Condition = Condition.objects.all()
-    serializer = ConditionSerializer(all_Condition, many=True)
-    return Response(serializer.data)
+def get_user(request):
+    serializer = UserSerializer(request.user)
+    return Response(serializer.data )
+
 @api_view(['GET'])
-def get_Stores(request):
-    all_Store = Store.objects.all()
-    serializer = StoreSerializer(all_Store, many=True)
-    return Response(serializer.data)
-@api_view(['GET'])
-def get_Shoppers(request):
-    all_Shopper = Shopper.objects.all()
-    serializer = ShopperSerializer(all_Shopper, many=True)
-    return Response(serializer.data)
-@api_view(['GET'])
-def get_Sellers(request):
-    all_Seller = Seller.objects.all()
-    serializer = SellerSerializer(all_Seller, many=True)
-    return Response(serializer.data)
-@api_view(['GET'])
-def get_Products(request):
-    all_Product = Product.objects.all()
-    serializer = ProductSerializer(all_Product, many=True)
-    return Response(serializer.data)
-@api_view(['GET'])
-def get_Orders(request):
-    all_Order = Order.objects.all()
-    serializer = OrderSerializer(all_Order, many=True)
-    return Response(serializer.data)
-@api_view(['GET'])
-def get_Carts(request):
-    all_Cart = Cart.objects.all()
-    serializer = CartSerializer(all_Cart, many=True)
-    return Response(serializer.data)
-@api_view(['GET'])
-def get_CartItems(request):
-    all_CartItem = CartItem.objects.all()
-    serializer = CartItemSerializer(all_CartItem, many=True)
-    return Response(serializer.data)
-@api_view(['GET'])
-def get_Wishlists(request):
-    all_Wishlist = Wishlist.objects.all()
-    serializer = WishlistSerializer(all_Wishlist, many=True)
+def get_model_by_page(request,model,page_amount):
+    my_model,my_serializer = MY_MODELS[model.title()]
+    page_no = request.GET.get('page')
+    page_no = page_no if page_no else 1
+    paginator = Paginator(my_model.objects.all(),page_amount)
+    page_results = paginator.get_page(page_no)
+    serializer = my_serializer(page_results, many=True)
     return Response(serializer.data)

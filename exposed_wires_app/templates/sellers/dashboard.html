@@ -18,19 +18,16 @@
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
       <div class="bg-bg-200 p-6 rounded-xl text-center shadow">
         <h2 class="text-lg font-semibold text-text-100">Total Products</h2>
-        <p class="text-3xl font-bold text-primary-100">{{ products_count }}</p>
+        <p class="text-3xl font-bold text-primary-100" id="product-count"></p>
       </div>
       <div class="bg-bg-200 p-6 rounded-xl text-center shadow">
         <h2 class="text-lg font-semibold text-text-100">Orders</h2>
-        <p class="text-3xl font-bold text-primary-100">{{ orders_count }}</p>
+        <p class="text-3xl font-bold text-primary-100" id="order-count"></p>
       </div>
-      <div class="bg-bg-200 p-6 rounded-xl text-center shadow">
-        <h2 class="text-lg font-semibold text-text-100">Revenue</h2>
-        <p class="text-3xl font-bold text-primary-100">${{ total_revenue }}</p>
-      </div>
+      
       <div class="bg-bg-200 p-6 rounded-xl text-center shadow">
         <h2 class="text-lg font-semibold text-text-100">Pending Orders</h2>
-        <p class="text-3xl font-bold text-primary-100">{{ pending_orders }}</p>
+        <p class="text-3xl font-bold text-primary-100" id="pendingOrder-count"></p>
       </div>
     </div>
 
@@ -66,14 +63,11 @@
         <tbody>
           {% for order in recent_orders %}
           <tr class="border-b border-bg-300">
-            <td class="py-2">#{{ order.id }}</td>
-            <td class="py-2">{{ order.product.name }}</td>
-            <td class="py-2">{{ order.quantity }}</td>
+            <td class="py-2" id="order-id">#{{ order.id }}</td>
+            <td class="py-2" id="order-product-name">{{ order.product.name }}</td>
+            <td class="py-2" id="order-quantity">{{ order.quantity }}</td>
             <td class="py-2">
-              <span class="px-3 py-1 rounded-lg text-white
-                {% if order.status == 'pending' %} bg-accent-200
-                {% elif order.status == 'completed' %} bg-primary-100
-                {% else %} bg-text-200 {% endif %}">
+              <span class="px-3 py-1 rounded-lg text-text-100" id="order-status">
                 {{ order.status|capfirst }}
               </span>
             </td>
@@ -123,3 +117,14 @@
   </div>
 </div>
 {% endblock %}
+{%block scripts%}
+  <script>
+      const productCountText = document.getElementById('product-count')
+      const orderCountText = document.getElementById('order-count')
+      const pendingOrderCountText = document.getElementById('pendingOrder-count')
+
+      async function seller_dashboard_page(){
+        let products = get_data(get_products)
+      }
+  </script>
+{%endblock%}

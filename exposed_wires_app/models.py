@@ -4,11 +4,12 @@ from cloudinary.models import CloudinaryField
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.postgres.fields import ArrayField
 
-
+class  Filter(models.Model):
+    key = models.CharField(max_length=32, null=True)
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
     image = CloudinaryField("image", blank=True, null=True)
-
+    filters = models.ManyToManyField(Filter,null=True)
     class Meta:
         verbose_name_plural = "Categories"
         ordering = ["name"]
@@ -89,10 +90,11 @@ class Product(models.Model):
         default=0,
         null=True
     )
+    clicks = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ["-created_at"]
+        ordering = ['-clicks',"-discount",'price',"-created_at"]
 
 
     def __str__(self):
@@ -164,7 +166,3 @@ class Wishlist(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s Wishlist - {self.product.name}"
-class  Filter(models.Model):
-    category = models.ForeignKey(Category)
-    key = models.CharField(max_length=32, null=True)
-    value = models.CharField(max_length=32, null=True)

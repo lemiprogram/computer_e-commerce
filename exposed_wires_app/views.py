@@ -13,7 +13,7 @@ def home(request):
 
 def shop(request):
     context = {
-        'products':Product.objects.all()
+        'product':Product.objects.get(pk=7)
     }
     if request.user.is_authenticated:
         if hasattr(request.user, "shopper_profile"):
@@ -85,3 +85,5 @@ def reports(request):
     return render(request, 'sellers/reports.html')
 def seller_account(request):
     return render(request, "sellers/account.html")
+def seller_store(request):
+    return render(request,'sellers/store.html')
