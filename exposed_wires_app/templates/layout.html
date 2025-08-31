@@ -2,20 +2,26 @@
 <!DOCTYPE html>
 <html>
 <head>
+    
+    
+    <meta name="csrf-token" content="{{ csrf_token }}">
     <title>{% block title %} Exposed Wires {% endblock %}</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style type="text/tailwindcss">      
         @theme {
-            --color-primary-100:#c21d03;
-            --color-primary-200:#fd5732;
-            --color-primary-300:#ffb787;
-            --color-accent-100:#393939;
-            --color-accent-200:#bebebe;
-            --color-text-100:#232121;
-            --color-text-200:#4b4848;
-            --color-bg-100:#fbfbfb;
-            --color-bg-200:#f1f1f1;
-            --color-bg-300:#c8c8c8;
+    --color-primary-100:#1E2022;
+    --color-primary-200:#34373b;
+    --color-primary-300:#F0F5F9;
+    --color-accent-100:#788189;
+    --color-accent-200:#e1e4e6;
+    --color-text-100:#1E2022;
+    --color-text-200:#52616B;
+    --color-bg-100:#F0F5F9;
+    --color-bg-200:#C9D6DF;
+    --color-bg-300:#bfc7d1;
+      
+      
+      
             --color-faded-black:#000000a5;
             --color-faded-grey:#00000005;
         }    
@@ -65,21 +71,90 @@
     {% endblock %}
 
     <script>
-        async function get_data(url){
-            return await fetch(url)
-                .then(res => res.json())
-                .then(data => data)
-        }
+        function getCSRFToken() {
+    const tokenMeta = document.querySelector('meta[name="csrf-token"]');
+    return tokenMeta ? tokenMeta.getAttribute("content") : "";
+}
+        // Notification helper
+function notify(message, type = "info") {
+    const container = document.getElementById("notifications") || (() => {
+        const div = document.createElement("div");
+        div.id = "notifications";
+        div.className = "fixed top-4 right-4 space-y-2 z-50";
+        document.body.appendChild(div);
+        return div;
+    })();
 
-        async function post_data(url, postData){
-            return await fetch(url, {
-                method:'POST',
-                headers:{ 'Content-Type':'application/json' },
-                body:JSON.stringify(postData)
-            })
-            .then(res => res.json())
-            .then(data => data)
+    const note = document.createElement("div");
+    note.className = `px-4 py-2 rounded-lg shadow text-white transition-opacity duration-500
+        ${type === "success" ? "bg-green-500" : ""}
+        ${type === "error" ? "bg-red-500" : ""}
+        ${type === "info" ? "bg-blue-500" : ""}`;
+
+    note.textContent = message;
+
+    container.appendChild(note);
+
+    setTimeout(() => {
+        note.style.opacity = "0";
+        setTimeout(() => note.remove(), 500);
+    }, 3000);
+}
+// GET
+async function get_data(url) {
+    try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("Failed to fetch data");
+        return await res.json();
+    } catch (err) {
+        notify(err.message, "error");
+        return null;
+    }
+}
+
+// POST
+async function post_data(url, postData) {
+    return await fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCSRFToken()
+        },
+        body: JSON.stringify(postData)
+    }).then(res => res.json());
+}
+
+async function put_data(url, putData) {
+    return await fetch(url, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCSRFToken()
+        },
+        body: JSON.stringify(putData)
+    }).then(res => res.json());
+}
+
+async function patch_data(url, patchData) {
+    return await fetch(url, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCSRFToken()
+        },
+        body: JSON.stringify(patchData)
+    }).then(res => res.json());
+}
+
+async function delete_data(url) {
+    return await fetch(url, {
+        method: "DELETE",
+        headers: {
+            "X-CSRFToken": getCSRFToken()
         }
+    }).then(res => res.json());
+}
+
 
         const BASE_URL = window.location.origin;
 
@@ -93,8 +168,10 @@
         const get_Carts_url = `${BASE_URL}/api/get/Carts/`;
         const get_CartItems_url = `${BASE_URL}/api/get/CartItems/`;
         const get_Wishlists_url = `${BASE_URL}/api/get/Wishlists/`;
-        const get_CustomUser_url = `${BASE_URL}/api/get/CustomUsers/`;
+        const get_CustomUser_url = `${BASE_URL}/api/get/Customusers/`;
         const get_User_url = `${BASE_URL}/api/get/user/`;
+
+        const delete_CustomUser_url = `${BASE_URL}/api/delete/Customusers/`
 
         function getPrice(priceStr, discount){
             price = parseFloat(priceStr)

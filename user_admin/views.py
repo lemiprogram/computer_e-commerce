@@ -4,6 +4,7 @@ from django.contrib.auth import logout
 from .decorators import admin_required
 from .forms import CategoryForm, ConditionForm
 from exposed_wires_app.models import *
+from django.shortcuts import get_object_or_404
 
 @login_required
 @admin_required

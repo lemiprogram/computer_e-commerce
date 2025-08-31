@@ -1,16 +1,170 @@
-{% extends 'layout.html' %}
+{% extends "layout.html" %}
 
 {% block admin_content %}
-<div class="p-6">
-  <h1 class="text-2xl font-bold mb-6">Manage Sellers</h1>
-  <ul>
-    {% for seller in sellers %}
-      <li class="flex justify-between items-center border-b py-2">
-        <span>{{ seller.user.username }} ({{ seller.store }})</span>
-      </li>
-    {% empty %}
-      <li>No sellers found.</li>
-    {% endfor %}
-  </ul>
+<div class="p-6 bg-bg-100 min-h-screen">
+
+  <!-- Page Title -->
+  <h1 class="text-3xl font-bold text-primary-100 mb-6">Manage Sellers</h1>
+
+  <!-- Search Bar -->
+  <div class="mb-6">
+    <input 
+      type="text" 
+      id="searchInput" 
+      placeholder="Search sellers by username or store..." 
+      class="w-full md:w-1/2 p-3 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-200"
+      onkeyup="filterSellers()"
+    >
+  </div>
+
+  <!-- Notifications -->
+  <div id="notifications" class="fixed top-4 right-4 space-y-3 z-50"></div>
+
+  <!-- Sellers Grid -->
+  <div id="sellersGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Seller cards will load here -->
+  </div>
+
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  let sellersData = [];
+
+  // 🔔 Notification system
+  function showNotification(message, type="info") {
+    const container = document.getElementById("notifications");
+    const div = document.createElement("div");
+
+    const colors = {
+      success: "bg-green-500",
+      error: "bg-red-500",
+      info: "bg-primary-200"
+    };
+
+    div.className = `${colors[type]} text-white px-4 py-2 rounded-lg shadow flex justify-between items-center animate-fade-in`;
+    div.innerHTML = `
+      <span>${message}</span>
+      <button onclick="this.parentElement.remove()" class="ml-4 font-bold">×</button>
+    `;
+
+    container.appendChild(div);
+
+    setTimeout(() => {
+      div.remove();
+    }, 4000);
+  }
+
+  // Fetch sellers + stores
+  const userMap = {};
+  async function fetchSellers() {
+    const [sellersRes, storesRes, all_users] = await Promise.all([
+      get_data(get_Sellers_url+0),
+      get_data(get_Stores_url+0),
+      get_data(get_CustomUser_url+0),
+    ]);
+    const storeMap = {};
+    storesRes.forEach(store => { storeMap[store.id] = store.name; });
+
+    sellersData = sellersRes.map(s => ({
+      ...s,
+      storeName: s.store ? storeMap[s.store] : "No store",
+    }));
+    all_users.filter(user=>user.role == 'seller').forEach(user => userMap[user.id] = user)
+    
+    renderSellers(sellersData);
+
+  }
+
+  // Render sellers as profile cards
+  async function renderSellers(data) {
+    const grid = document.getElementById("sellersGrid");
+    grid.innerHTML = "";
+
+    if (data.length === 0) {
+      grid.innerHTML = `<p class="col-span-full text-text-200">No sellers found.</p>`;
+      return;
+    }
+
+    for (let seller of data){
+      let user = await get_data(get_CustomUser_url+seller.user);
+
+      const card = document.createElement("div");
+      card.className = "bg-bg-100 rounded-xl shadow-lg p-6 flex flex-col items-center text-center";
+
+      card.innerHTML = `
+        ${ user.profile_pic
+          ? `<img src="${user.profile_pic}" alt="${user.username}" class="w-20 h-20 rounded-full object-cover mb-4">`
+          : `<div class="w-20 h-20 rounded-full bg-bg-300 flex items-center justify-center text-xl font-bold text-white mb-4">
+               ${user.username.charAt(0).toUpperCase()}
+             </div>`
+        }
+
+        <h2 class="text-lg font-semibold text-text-100">${user.username}</h2>
+        <p class="text-sm text-text-200">${user.email}</p>
+        <p class="mt-2 text-sm">Store: 
+          <span class="font-medium text-primary-100">${seller.storeName}</span>
+        </p>
+
+        <div class="mt-4 flex gap-4">
+          <a href="/sellers/${seller.id}" class="px-4 py-2 bg-primary-100 text-white rounded-lg hover:bg-primary-200">
+            View
+          </a>
+          <button onclick="deleteSeller(${seller.user}, '${user.username}')" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+            Delete
+          </button>
+        </div>
+      `;
+
+      grid.appendChild(card);
+    }
+  }
+
+  // Search filter
+  function filterSellers() {
+    console.log(userMap)
+    const input = document.getElementById("searchInput").value.toLowerCase();
+    const filtered = sellersData.filter(s =>
+      userMap[s.user].username.toLowerCase().includes(input) ||
+      s.storeName.toLowerCase().includes(input)
+    );
+    renderSellers(filtered);
+  }
+
+  // Delete seller → show notifications instead of alerts/confirm
+  async function deleteSeller(id, username) {
+    // Soft confirmation (first click = notify, second click within 3s = confirm)
+    if (!deleteSeller.pending || deleteSeller.pending !== id) {
+      deleteSeller.pending = id;
+      showNotification(`Click delete again to confirm removing "${username}".`, "info");
+      setTimeout(() => { if (deleteSeller.pending === id) deleteSeller.pending = null; }, 3000);
+      return;
+    }
+
+    deleteSeller.pending = null;
+    const res = await delete_data(delete_CustomUser_url+id);
+
+    if (res.ok) {
+      sellersData = sellersData.filter(s => s.id !== id);
+      renderSellers(sellersData);
+      showNotification(`Seller "${username}" deleted successfully.`, "success");
+    } else {
+      showNotification(`Failed to delete seller "${username}".`, "error");
+    }
+  }
+
+  // Init load
+  fetchSellers();
+</script>
+
+<style>
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate-fade-in {
+    animation: fade-in 0.3s ease-out;
+  }
+</style>
 {% endblock %}

@@ -29,6 +29,17 @@ def get_model(request,model,pk):
 
     serializer = my_serializer(all_models) if pk else my_serializer(all_models, many=True)
     return Response(serializer.data)
+@api_view(['DELETE'])
+def delete_model(request, model, pk):
+    my_model, _ = MY_MODELS[model.title()]
+
+    try:
+        instance = my_model.objects.get(pk=pk)
+        instance.delete()
+        return Response({"message": f"{model.title()} with id {pk} deleted successfully."}, status=204)
+    except my_model.DoesNotExist:
+        return Response({"error": f"{model.title()} with id {pk} not found."}, status=404)
+
 @api_view(['GET'])
 def get_user(request):
     serializer = CustomUserSerializer(request.user)

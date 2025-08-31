@@ -30,6 +30,7 @@ class Condition(models.Model):
 
 class Store(models.Model):
     name = models.CharField(max_length=150)
+    profile_image = CloudinaryField("image", blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     city = models.CharField(max_length=100, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
