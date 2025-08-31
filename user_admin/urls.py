@@ -10,6 +10,10 @@ urlpatterns = [
     path("conditions/", admin_condition_list, name="admin_condition_list"),
     path("conditions/create/", admin_condition_create, name="admin_condition_create"),
     path("conditions/delete/<int:pk>", admin_category_delete, name="admin_condition_delete"),
+    path("filters/", admin_filter_list, name="admin_filter_list"),
+    path("filters/assign/<int:category_id>/<int:filter_id>/", assign_filter, name="assign_filter"),
+    path("filters/create/", admin_create_filter, name="admin_create_filter"),
+
 
     path("sellers/", admin_seller_list, name="admin_seller_list"),
     path("shoppers/", admin_shopper_list, name="admin_shopper_list"),

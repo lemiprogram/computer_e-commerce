@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from .decorators import admin_required
 from .forms import CategoryForm, ConditionForm
-from exposed_wires_app.models import Category, Condition, Seller, Shopper,Store
+from exposed_wires_app.models import *
 
 @login_required
 @admin_required
@@ -63,7 +63,7 @@ def logout_view(request):
     return redirect("login")
 
 def admin_category_create(request):
-    form = CategoryForm(request.POST)
+    form = CategoryForm(request.POST,request.FILES)
     if form.is_valid():
         form.save()
     return redirect('admin_category_list')
@@ -81,3 +81,38 @@ def admin_condition_delete(request, pk):
     to_delete = Condition.objects.get(pk=pk)
     to_delete.delete()
     return redirect('admin_condition_list')
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.shortcuts import render
+
+@login_required
+@admin_required
+def admin_filter_list(request):
+    categories = Category.objects.prefetch_related("filters").all()
+    filters = Filter.objects.all()
+
+    return render(request, "filter_list.html", {
+        "categories": categories,
+        "filters": filters
+    })
+
+
+@admin_required
+def assign_filter(request, category_id, filter_id):
+    category = get_object_or_404(Category, id=category_id)
+    filter_obj = get_object_or_404(Filter, id=filter_id)
+
+    if filter_obj not in category.filters.all():
+        category.filters.add(filter_obj)
+    else:
+        category.filters.remove(filter_obj)
+
+    return redirect("admin_filter_list")
+
+
+@admin_required
+def admin_create_filter(request):
+    key = request.POST.get("key")
+    if key:
+        Filter.objects.get_or_create(key=key.strip())
+    return redirect("admin_filter_list")
+

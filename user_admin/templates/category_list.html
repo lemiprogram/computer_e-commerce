@@ -21,7 +21,7 @@
     <!-- Category Image -->
     <div class="flex flex-col space-y-2">
         <label class="text-sm font-medium text-text-200">Category Image</label>
-        <input type="file" name="image"
+        <input type="file" name="image" accept="image/*"
                class="file:mr-4 file:py-2 file:px-4 file:rounded-full 
                       file:border-0 file:text-sm file:font-semibold 
                       file:bg-primary-100 file:text-white 
@@ -40,11 +40,11 @@
   <div class="mt-6">
     <div class="flex gap-5">
       {% for category in categories %}
-        <div class="max-w-xs min-w-[200px] bg-white shadow-lg rounded-2xl overflow-hidden hover:shadow-xl transition duration-300">
-          <div class="h-40 w-full overflow-hidden">
-            <img src="{{ category.image.url }}" alt="{{ category.name }}" class="h-full w-full object-cover">
+        <div class="max-w-xs w-[450px] bg-white shadow-lg rounded-2xl overflow-hidden hover:shadow-xl transition duration-300">
+          <div class="h-20 w-full overflow-hidden">
+            <img src="{{ category.image.url }}" alt="{{ category.name }}" class=" object-contain h-full w-full ">
           </div>
-          <div class="p-4 text-center">
+          <div class=" text-center">
             <h3 class="text-lg font-semibold text-text-100">{{ category.name }}</h3>
           </div>
           <div class="flex justify-center"><a href="{% url 'admin_category_delete' category.id %}" class="text-red-500 hover:underline ">Delete</a></div>
