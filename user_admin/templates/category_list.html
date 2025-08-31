@@ -1,6 +1,6 @@
 {% extends 'layout.html' %}
 
-{% block content %}
+{% block admin_content %}
 <div class="p-6">
   <h1 class="text-2xl font-bold mb-6">Manage Categories</h1>
   <form action="{% url 'admin_category_create' %}" method="post" enctype="multipart/form-data"

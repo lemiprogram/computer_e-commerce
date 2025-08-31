@@ -1,13 +1,12 @@
 {% extends 'layout.html' %}
 
-{% block content %}
+{% block admin_content %}
 <div class="p-6">
   <h1 class="text-2xl font-bold mb-6">Manage Sellers</h1>
   <ul>
     {% for seller in sellers %}
       <li class="flex justify-between items-center border-b py-2">
         <span>{{ seller.user.username }} ({{ seller.store }})</span>
-        <a href="{% url 'admin_seller_delete' seller.id %}" class="text-red-500 hover:underline">Delete</a>
       </li>
     {% empty %}
       <li>No sellers found.</li>
