@@ -15,7 +15,10 @@ urlpatterns = [
     path("seller/manage_products/add/", add_product, name="add_product"),
     path("seller/orders/", manage_orders, name="manage_orders"),
     path("seller/reports/", reports, name="reports"),
-    path("seller/acccount/", seller_account, name="seller_account"),
-    path("seller/store/", seller_store, name="seller_store"),
+    path("seller/account/", seller_account, name="seller_account"),
+    
+    path("seller/stores/", stores, name="stores"),
+    path("seller/stores/create/", create_store, name="create_store"),
+    path("seller/stores/join/", join_store, name="join_store"),
 ]
                         

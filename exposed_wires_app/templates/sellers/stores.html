@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="min-h-screen bg-bg-100 p-8">
+  <div class="max-w-5xl mx-auto bg-bg-300 shadow-xl rounded-2xl p-8">
+
+    <h1 class="text-3xl font-bold text-primary-100 mb-8">My Store</h1>
+
+    {% if store %}
+      <!-- User already has a store -->
+      <div class="bg-white shadow-md rounded-xl p-6 flex flex-col md:flex-row gap-6 items-center">
+        {% if store.profile_image %}
+          <img src="{{ store.profile_image.url }}" alt="{{ store.name }}" class="w-40 h-40 rounded-lg object-cover">
+        {% else %}
+          <div class="w-40 h-40 flex items-center justify-center rounded-lg bg-bg-200 text-4xl font-bold text-primary-100">
+            {{ store.name|slice:":1" }}
+          </div>
+        {% endif %}
+        <div class="flex-1">
+          <h2 class="text-2xl font-semibold text-text-100">{{ store.name }}</h2>
+          <p class="text-text-200 mt-2">{{ store.description|default:"No description provided." }}</p>
+          <p class="text-sm text-text-200 mt-4">📍 {{ store.city }}, {{ store.address }}</p>
+          <p class="text-sm text-text-200">📞 {{ store.phone }}</p>
+          {% if store.website %}
+            <p class="text-sm"><a href="{{ store.website }}" target="_blank" class="text-primary-100 underline">🌐 Website</a></p>
+          {% endif %}
+          <div class="mt-4 flex gap-3">
+            <a href="{% url 'manage_products' %}" class="bg-primary-100 text-white px-4 py-2 rounded-lg hover:bg-primary-200">Manage Products</a>
+            <a href="{% url 'edit_store' store.id %}" class="bg-bg-200 text-text-100 px-4 py-2 rounded-lg hover:bg-bg-400">Edit Store</a>
+          </div>
+        </div>
+      </div>
+
+    {% else %}
+      <!-- User has no store yet -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        
+        <!-- Join a Store -->
+        <div class="bg-white rounded-xl shadow-md p-8 flex flex-col items-center text-center hover:shadow-lg transition">
+          <div class="w-20 h-20 flex items-center justify-center rounded-full bg-primary-100 text-white text-3xl mb-4">
+            🤝
+          </div>
+          <h3 class="text-xl font-semibold text-text-100 mb-2">Join a Store</h3>
+          <p class="text-text-200 mb-4">Already part of a business? Join an existing store managed by your team.</p>
+          <a href="{% url 'join_store' %}" class="bg-primary-100 text-white px-5 py-2 rounded-lg hover:bg-primary-200">Join Store</a>
+        </div>
+
+        <!-- Create a Store -->
+        <div class="bg-white rounded-xl shadow-md p-8 flex flex-col items-center text-center hover:shadow-lg transition">
+          <div class="w-20 h-20 flex items-center justify-center rounded-full bg-accent-200 text-white text-3xl mb-4">
+            🏬
+          </div>
+          <h3 class="text-xl font-semibold text-text-100 mb-2">Create a Store</h3>
+          <p class="text-text-200 mb-4">Start fresh and create your own store to sell products directly.</p>
+          <a href="{% url 'create_store' %}" class="bg-accent-200 text-white px-5 py-2 rounded-lg hover:bg-accent-100">Create Store</a>
+        </div>
+
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

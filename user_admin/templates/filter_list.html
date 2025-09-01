@@ -1,0 +1,84 @@
+{% extends "layout.html" %}
+
+{% block admin_content %}
+<div class="flex-1 p-8 bg-bg-100 min-h-screen">
+
+  <!-- Page Title -->
+  <h1 class="text-3xl font-bold text-primary-100 mb-6">Manage Filters</h1>
+
+  <!-- Create Filter Form -->
+  <div class="mb-8 bg-white shadow-lg rounded-xl p-6">
+    <h2 class="text-xl font-semibold text-text-100 mb-4">Create New Filter</h2>
+    <form action="{% url 'admin_create_filter' %}" method="POST" class="flex gap-4 items-center">
+      {% csrf_token %}
+      <input 
+        type="text" 
+        name="key" 
+        placeholder="Enter filter key (e.g. Size, Color)" 
+        class="flex-1 px-4 py-2 border rounded-lg text-text-100 focus:outline-none focus:ring-2 focus:ring-primary-200"
+        required
+      >
+      <button 
+        type="submit" 
+        class="px-4 py-2 bg-primary-100 text-white rounded-lg shadow hover:bg-primary-200"
+      >
+        Add Filter
+      </button>
+    </form>
+  </div>
+
+  <!-- Categories & Filters -->
+  <div class="space-y-6">
+    {% for category in categories %}
+      <div class="bg-white shadow-lg rounded-xl p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold text-text-100">
+            {{ category.name }}
+          </h2>
+          {% if category.image %}
+            <img src="{{ category.image.url }}" alt="{{ category.name }}" class="h-12 w-12 object-cover rounded-full">
+          {% endif %}
+        </div>
+
+        <!-- Current Filters -->
+        <div class="mb-4">
+          <h3 class="text-sm font-semibold text-text-200 mb-2">Assigned Filters:</h3>
+          {% if category.filters.all %}
+            <div class="flex flex-wrap gap-2">
+              {% for filter in category.filters.all %}
+                <span class="px-3 py-1 bg-primary-300 text-text-100 rounded-full text-sm">
+                  {{ filter.key }}
+                  <a href="{% url 'assign_filter' category.id filter.id %}" class="ml-2 text-red-500 hover:underline">✕</a>
+                </span>
+              {% endfor %}
+            </div>
+          {% else %}
+            <p class="text-text-200 text-sm">No filters assigned.</p>
+          {% endif %}
+        </div>
+
+        <!-- Assign New Filter -->
+        <form method="POST" action="" class="mt-4">
+          <h3 class="text-sm font-semibold text-text-200 mb-2">Assign Filter:</h3>
+          <div class="flex gap-4">
+            {% csrf_token %}
+            <select 
+              name="filter_id"
+              class="flex-1 px-3 py-2 border rounded-lg text-text-100 focus:outline-none focus:ring-2 focus:ring-primary-200"
+              onchange="if(this.value) { window.location.href='{% url `assign_filter` category.id 0 %}'.replace('/0/','/' + this.value + '/'); }"
+            >
+              <option value="">-- Select Filter --</option>
+              {% for filter in filters %}
+                <option value="{{ filter.id }}">{{ filter.key }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </form>
+      </div>
+    {% empty %}
+      <p class="text-text-200">No categories found.</p>
+    {% endfor %}
+  </div>
+
+</div>
+{% endblock %}

@@ -98,11 +98,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
         window.deleteProduct.pending = null;
 
-
+        // perform DELETE directly (handles 204 and JSON responses)
+        try {
+          console.log(delete_Products_url)
             const res = await delete_data(delete_Products_url+id)
             products = products.filter(p => p.id !== id);
             renderProducts(products);
             notify('Deleted Successfully','success')
+
+        } catch (err) {
+            if (typeof notify === 'function') notify(err.message || "Delete failed", "error");
+            else console.error(err);
+        }
     };
 });
 </script>

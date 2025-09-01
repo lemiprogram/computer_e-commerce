@@ -85,5 +85,59 @@ def reports(request):
     return render(request, 'sellers/reports.html')
 def seller_account(request):
     return render(request, "sellers/account.html")
-def seller_store(request):
-    return render(request,'sellers/store.html')
+def stores(request):
+    # Check if user is a seller with a store
+    seller = getattr(request.user, "seller", None)
+    store = seller.store if seller and hasattr(seller, "store") else None
+
+    return render(request, "sellers/stores.html", {"store": store})
+
+
+def create_store(request):
+    if request.method == "POST":
+        name = request.POST.get("name")
+        description = request.POST.get("description")
+        city = request.POST.get("city")
+        address = request.POST.get("address")
+        phone = request.POST.get("phone")
+        website = request.POST.get("website")
+
+        if not name:
+            messages.error(request, "Store name is required.")
+            return redirect("create_store")
+
+        # Create new store
+        store = Store.objects.create(
+            name=name,
+            description=description,
+            city=city,
+            address=address,
+            phone=phone,
+            website=website,
+        )
+
+        # Link store to seller
+        seller, _ = Seller.objects.get_or_create(user=request.user)
+        seller.store = store
+        seller.save()
+
+        messages.success(request, f"Store '{store.name}' created successfully!")
+        return redirect("stores")
+
+    return render(request, "create_store.html")
+
+
+def join_store(request):
+    if request.method == "POST":
+        store_id = request.POST.get("store_id")
+        store = get_object_or_404(Store, id=store_id)
+
+        seller, _ = Seller.objects.get_or_create(user=request.user)
+        seller.store = store
+        seller.save()
+
+        messages.success(request, f"You have joined '{store.name}' successfully!")
+        return redirect("stores")
+
+    stores = Store.objects.all()
+    return render(request, "join_store.html", {"stores": stores})
