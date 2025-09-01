@@ -2,7 +2,6 @@
 
 {% block content %}
 <div class="min-h-screen bg-bg-100 p-8">
-  <!-- Dashboard Container -->
   <div class="max-w-7xl mx-auto bg-bg-300 shadow-xl rounded-2xl p-8">
     
     <!-- Header -->
@@ -18,16 +17,15 @@
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
       <div class="bg-bg-200 p-6 rounded-xl text-center shadow">
         <h2 class="text-lg font-semibold text-text-100">Total Products</h2>
-        <p class="text-3xl font-bold text-primary-100" id="product-count"></p>
+        <p class="text-3xl font-bold text-primary-100" id="product-count">0</p>
       </div>
       <div class="bg-bg-200 p-6 rounded-xl text-center shadow">
         <h2 class="text-lg font-semibold text-text-100">Orders</h2>
-        <p class="text-3xl font-bold text-primary-100" id="order-count"></p>
+        <p class="text-3xl font-bold text-primary-100" id="order-count">0</p>
       </div>
-      
       <div class="bg-bg-200 p-6 rounded-xl text-center shadow">
         <h2 class="text-lg font-semibold text-text-100">Pending Orders</h2>
-        <p class="text-3xl font-bold text-primary-100" id="pendingOrder-count"></p>
+        <p class="text-3xl font-bold text-primary-100" id="pendingOrder-count">0</p>
       </div>
     </div>
 
@@ -60,24 +58,10 @@
             <th class="py-2">Date</th>
           </tr>
         </thead>
-        <tbody>
-          {% for order in recent_orders %}
-          <tr class="border-b border-bg-300">
-            <td class="py-2" id="order-id">#{{ order.id }}</td>
-            <td class="py-2" id="order-product-name">{{ order.product.name }}</td>
-            <td class="py-2" id="order-quantity">{{ order.quantity }}</td>
-            <td class="py-2">
-              <span class="px-3 py-1 rounded-lg text-text-100" id="order-status">
-                {{ order.status|capfirst }}
-              </span>
-            </td>
-            <td class="py-2">{{ order.created_at|date:"M d, Y" }}</td>
-          </tr>
-          {% empty %}
+        <tbody id="recent-orders">
           <tr>
-            <td colspan="5" class="text-center py-4 text-text-200">No recent orders</td>
+            <td colspan="5" class="text-center py-4 text-text-200">Loading...</td>
           </tr>
-          {% endfor %}
         </tbody>
       </table>
     </div>
@@ -85,46 +69,69 @@
     <!-- Top Products -->
     <div class="bg-bg-200 p-6 rounded-xl shadow mb-10">
       <h2 class="text-xl font-bold text-text-100 mb-4">Top Selling Products</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {% for product in top_products %}
-        <div class="bg-bg-300 rounded-lg shadow-lg p-4 text-center">
-          {% if product.image %}
-            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-40 object-cover rounded-md mb-4">
-          {% endif %}
-          <h3 class="font-semibold text-text-100">{{ product.name }}</h3>
-          <p class="text-text-200">${{ product.price }}</p>
-          <p class="text-primary-100 font-bold">{{ product.orders.count }} Orders</p>
-        </div>
-        {% empty %}
-        <p class="text-text-200">No top products available.</p>
-        {% endfor %}
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="top-products">
+        <p class="text-text-200">Loading...</p>
       </div>
     </div>
 
-    <!-- Notifications -->
-    <div class="bg-bg-200 p-6 rounded-xl shadow">
-      <h2 class="text-xl font-bold text-text-100 mb-4">Notifications</h2>
-      <ul class="space-y-3">
-        {% for notification in notifications %}
-          <li class="p-3 bg-bg-300 rounded-lg shadow-sm text-text-200">
-            {{ notification }}
-          </li>
-        {% empty %}
-          <li class="text-text-200">No notifications at this time.</li>
-        {% endfor %}
-      </ul>
-    </div>
   </div>
 </div>
-{% endblock %}
-{%block scripts%}
-  <script>
-      const productCountText = document.getElementById('product-count')
-      const orderCountText = document.getElementById('order-count')
-      const pendingOrderCountText = document.getElementById('pendingOrder-count')
 
-      async function seller_dashboard_page(){
-        let products = get_data(get_products)
-      }
-  </script>
-{%endblock%}
+<script>
+(async () => {
+    try {
+        
+        const user = await get_data(get_User_url)
+        const sellers = await get_data(get_Sellers_url+0)
+        const seller = sellers.filter(s=>s.user == user.id)[0]
+        let products = await get_data(get_Products_url+0) || [];
+        products = products.filter(p=>p.seller == seller.id)
+        let orders = await get_data(get_Orders_url+0) || [];
+        orders = orders.filter(o=>o.product==products.id)
+
+        // Stats
+        document.getElementById("product-count").innerText = products.length;
+        document.getElementById("order-count").innerText = orders.length;
+        document.getElementById("pendingOrder-count").innerText = orders.filter(o => o.status === "pending").length;
+
+        // Recent Orders
+        const ordersTable = document.getElementById("recent-orders");
+        ordersTable.innerHTML = "";
+        if (orders.length) {
+            orders.slice(0, 5).forEach(o => {
+                ordersTable.innerHTML += `
+                  <tr class="border-b border-bg-300">
+                    <td class="py-2">#${o.id}</td>
+                    <td class="py-2">${o.product?.name || "N/A"}</td>
+                    <td class="py-2">${o.quantity}</td>
+                    <td class="py-2"><span class="px-3 py-1 rounded-lg text-text-100">${o.status}</span></td>
+                    <td class="py-2">${new Date(o.created_at).toLocaleDateString()}</td>
+                  </tr>`;
+            });
+        } else {
+            ordersTable.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-text-200">No recent orders</td></tr>`;
+        }
+
+        // Top Products
+        const topProductsDiv = document.getElementById("top-products");
+        topProductsDiv.innerHTML = "";
+        if (products.length) {
+            products.slice(0, 3).forEach(p => {
+                topProductsDiv.innerHTML += `
+                  <div class="bg-bg-300 rounded-lg shadow-lg p-4 text-center">
+                    ${p.image ? `<img src="${p.image}" alt="${p.name}" class="w-full h-40 object-cover rounded-md mb-4">` : ""}
+                    <h3 class="font-semibold text-text-100">${p.name}</h3>
+                    <p class="text-text-200">$${p.price}</p>
+                    <p class="text-primary-100 font-bold">${p.orders_count || 0} Orders</p>
+                  </div>`;
+            });
+        } else {
+            topProductsDiv.innerHTML = `<p class="text-text-200">No top products available.</p>`;
+        }
+
+    } catch (err) {
+        notify("Failed to load dashboard data", "error");
+    }
+})();
+</script>
+{% endblock %}

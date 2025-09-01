@@ -1,92 +1,111 @@
 {% extends "layout.html" %}
+
 {% block content %}
-<div class="p-6 space-y-10">
+<div class="min-h-screen bg-bg-100 py-10">
+    <div class="max-w-5xl mx-auto bg-bg-300 shadow-xl rounded-2xl p-8">
 
-  <!-- Page Title -->
-  <h1 class="text-3xl font-bold text-primary-100">Seller Account</h1>
-  <p class="text-text-100 mb-6">Manage your account details, store information, and security settings.</p>
+        <!-- Profile Header -->
+        <div class="flex items-center justify-between border-b border-bg-200 pb-6 mb-6">
+            <div class="flex items-center space-x-6">
+                <!-- Profile Picture or First Letter -->
+                {% if user.profile_pic %}
+                    <img src="{{ user.profile_pic.url }}" alt="Profile"
+                         class="w-24 h-24 rounded-full object-cover shadow-md">
+                {% else %}
+                    <div class="w-24 h-24 rounded-full bg-primary-100 flex items-center justify-center text-white text-4xl font-bold">
+                        {{ user.username|first|upper }}
+                    </div>
+                {% endif %}
+                
+                <!-- User Info -->
+                <div>
+                    <h2 class="text-3xl font-bold text-text-100 capitalize">{{ user.username }}</h2>
+                    <p class="text-text-200">{{ user.email }}</p>
+                    <p class="text-text-200">Joined: {{ user.date_joined|date:"M d, Y" }}</p>
+                </div>
+            </div>
 
-  <!-- Sections Grid -->
-  <div class="flex flex-wrap gap-6">
-      <!-- Profile Info -->
-      <section class="bg-bg-200 shadow-md rounded-2xl p-6 flex-1 min-w-[300px]">
-        <h2 class="text-xl font-semibold text-primary-100 mb-4">Profile Information</h2>
-        <div class="space-y-2">
-          <p><span class="font-bold">Username:</span> {{ seller.user.username }}</p>
-          <p><span class="font-bold">Email:</span> {{ seller.user.email }}</p>
-          <p><span class="font-bold">Phone:</span> {{ seller.phone }}</p>
-          <p><span class="font-bold">City:</span> {{ seller.city }}</p>
-          <p><span class="font-bold">Address:</span> {{ seller.address }}</p>
+            <!-- Role Badge -->
+            <span class="px-4 py-2 rounded-full bg-accent-200 text-white font-semibold">Seller</span>
         </div>
-        <div class="mt-4">
-          <a href="#" class="bg-primary-100 text-white px-4 py-2 rounded-lg shadow hover:bg-primary-200">Edit Profile</a>
-        </div>
-      </section>
 
-      <!-- Store Info -->
-      <section class="bg-bg-200 shadow-md rounded-2xl p-6 flex-1 min-w-[300px]">
-        <h2 class="text-xl font-semibold text-primary-100 mb-4">Store Information</h2>
-        <div class="space-y-2">
-          <p><span class="font-bold">Store Name:</span> {{ seller.store_name }}</p>
-          <p><span class="font-bold">Description:</span> {{ seller.store_description }}</p>
-          <p><span class="font-bold">Products Listed:</span> {{ seller.products.count }}</p>
-          <p><span class="font-bold">Orders Received:</span> {{ orders_count }}</p>
-        </div>
-        <div class="mt-4">
-          <a href="{% url 'manage_products' %}" class="bg-primary-100 text-white px-4 py-2 rounded-lg shadow hover:bg-accent-200">Manage Store</a>
-        </div>
-      </section>
+        <!-- Account Settings -->
+        <div class="space-y-8">
 
-      <!-- Security Settings -->
-      <section class="bg-bg-200 shadow-md rounded-2xl p-6 flex-1 min-w-[300px]">
-        <h2 class="text-xl font-semibold text-primary-100 mb-4">Security Settings</h2>
-        <div class="space-y-2">
-          <p><span class="font-bold">Password:</span> ********</p>
-          <p><span class="font-bold">Last Login:</span> {{ seller.user.last_login }}</p>
-        </div>
-        <div class="mt-4 flex space-x-3">
-          <a href="#" class="bg-primary-100 text-white px-4 py-2 rounded-lg shadow hover:bg-primary-200">Change Password</a>
-          <a href="#" class="bg-red-500 text-white px-4 py-2 rounded-lg shadow hover:bg-red-600">Deactivate Account</a>
-        </div>
-      </section>
+            <!-- Profile Info -->
+            <div class="bg-bg-200 rounded-xl p-6 shadow-md">
+                <h3 class="text-xl font-semibold text-text-100 mb-4">Profile Information</h3>
+                <form method="POST" enctype="multipart/form-data" id="seller-profile-form">
+                    {% csrf_token %}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-text-200 mb-1">Username</label>
+                            <input type="text" name="username" value="{{ user.username }}"
+                                   class="w-full p-3 rounded-lg border border-bg-300 focus:ring-2 focus:ring-primary-200">
+                        </div>
+                        <div>
+                            <label class="block text-text-200 mb-1">Email</label>
+                            <input type="email" name="email" value="{{ user.email }}"
+                                   class="w-full p-3 rounded-lg border border-bg-300 focus:ring-2 focus:ring-primary-200">
+                        </div>
+                        <div>
+                            <label class="block text-text-200 mb-1">Phone Number</label>
+                            <input type="text" name="phone" value="{{ user.phone|default:'' }}"
+                                   class="w-full p-3 rounded-lg border border-bg-300 focus:ring-2 focus:ring-primary-200">
+                        </div>
+                        <div>
+                            <label class="block text-text-200 mb-1">Profile Picture</label>
+                            <input type="file" name="profile_pic" 
+                                   class="w-full p-2 rounded-lg border border-bg-300 focus:ring-2 focus:ring-primary-200">
+                        </div>
+                    </div>
+                    <div class="flex justify-end mt-6">
+                        <button type="submit" class="bg-primary-200 hover:bg-primary-100 text-white px-6 py-2 rounded-lg">
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
 
-      <!-- Preferences -->
-      <section class="bg-bg-200 shadow-md rounded-2xl p-6 flex-1 min-w-[300px]">
-        <h2 class="text-xl font-semibold text-primary-100 mb-4">Preferences</h2>
-        <form class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium mb-1 text-text-100">Email Notifications</label>
-            <select class="w-full p-2 rounded-lg bg-bg-300 text-text-100">
-              <option>Enabled</option>
-              <option>Disabled</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-1 text-text-100">Dashboard Theme</label>
-            <select class="w-full p-2 rounded-lg bg-bg-300 text-text-100">
-              <option>Light</option>
-              <option>Dark</option>
-            </select>
-          </div>
-          <button type="submit" class="bg-primary-100 text-white px-4 py-2 rounded-lg shadow hover:bg-primary-200">Save Preferences</button>
-        </form>
-      </section>
+            <!-- Store Info -->
+            <div class="bg-bg-200 rounded-xl p-6 shadow-md">
+                <h3 class="text-xl font-semibold text-text-100 mb-4">Store Information</h3>
+                <form method="POST" id="seller-store-form">
+                    {% csrf_token %}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-text-200 mb-1">Store Name</label>
+                            <input type="text" name="store_name" value="{{ seller.store_name|default:'' }}"
+                                   class="w-full p-3 rounded-lg border border-bg-300 focus:ring-2 focus:ring-accent-200">
+                        </div>
+                        <div>
+                            <label class="block text-text-200 mb-1">Store Description</label>
+                            <textarea name="store_description"
+                                      class="w-full p-3 rounded-lg border border-bg-300 focus:ring-2 focus:ring-accent-200">{{ seller.store_description|default:'' }}</textarea>
+                        </div>
+                    </div>
+                    <div class="flex justify-end mt-6">
+                        <button type="submit" class="bg-accent-200 hover:bg-accent-100 text-white px-6 py-2 rounded-lg">
+                            Save Store
+                        </button>
+                    </div>
+                </form>
+            </div>
 
-      <!-- New Section: Recent Activity -->
-      <section class="bg-bg-200 shadow-md rounded-2xl p-6 flex-1 min-w-[300px]">
-        <h2 class="text-xl font-semibold text-primary-100 mb-4">Recent Activity</h2>
-        <ul class="space-y-3 text-text-100">
-          <li>🛒 New order placed for <span class="font-bold">Product A</span> – 2 hours ago</li>
-          <li>📦 Product <span class="font-bold">"Wireless Headphones"</span> updated – Yesterday</li>
-          <li>🔑 Password changed – 2 days ago</li>
-          <li>📊 Viewed monthly sales report – 3 days ago</li>
-          <li>✅ Account verified – 1 week ago</li>
-        </ul>
-        <div class="mt-4">
-          <a href="{% url 'reports' %}" class="bg-primary-100 text-white px-4 py-2 rounded-lg shadow hover:bg-primary-200">View All Activity</a>
+            <!-- Security -->
+            <div class="bg-bg-200 rounded-xl p-6 shadow-md">
+                <h3 class="text-xl font-semibold text-text-100 mb-4">Security</h3>
+                <div class="flex space-x-4">
+                    <a href="{% url 'password_change' %}" class="bg-primary-200 hover:bg-primary-100 text-white px-5 py-2 rounded-lg">
+                        Change Password
+                    </a>
+                    <a href="{% url 'sign_out' %}" class="bg-accent-200 hover:bg-accent-100 text-white px-5 py-2 rounded-lg">
+                        Logout
+                    </a>
+                </div>
+            </div>
+
         </div>
-      </section>
-  </div>
-
+    </div>
 </div>
 {% endblock %}

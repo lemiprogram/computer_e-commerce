@@ -2,27 +2,10 @@
   <div class="p-4 max-w-7xl mx-auto flex items-center justify-between">
     
     <!-- Logo -->
-    <a href="{% url 'seller_dashboard'%}" class="text-white text-2xl font-bold font-serif">Exposed Wires</a>
+    <a href="/seller/dashboard" class="text-white text-2xl font-bold font-serif">Exposed Wires</a>
 
     <!-- Desktop Links -->
-    <div class="hidden md:flex space-x-6 items-center">
-      <a href="{% url 'seller_dashboard'%}" class="text-white hover:text-gray-300 cursor-pointer">Dashboard</a>
-      <a href="{% url 'manage_products' %}" class="text-white hover:text-gray-300 cursor-pointer">My Products</a>
-      <a href="{% url 'add_product' %}" class="text-white hover:text-gray-300 cursor-pointer">Add Product</a>
-      <a href="{% url 'manage_orders'%}" class="text-white hover:text-gray-300 cursor-pointer">Orders</a>
-      <a href="{% url 'reports'%}" class="text-white hover:text-gray-300 cursor-pointer">Reports</a>
-
-      <!-- Account -->
-      <a href="{% url 'seller_account' %}" >
-        <button id="seller-account-btn" class="text-white hover:text-gray-300 cursor-pointer ">
-          <svg xmlns="http://www.w3.org/2000/svg"
-               class="w-6 h-6 cursor-pointer" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 4 4zm0 2c-3.31 0-6 2.69-6 6h12c0-3.31-2.69-6-6-6z"/>
-          </svg>
-        </button>
-      </a>
-    </div>
+    <div id="seller-desktop-links" class="hidden md:flex space-x-6 items-center"></div>
 
     <!-- Mobile Toggle -->
     <div class="md:hidden flex items-center">
@@ -38,29 +21,76 @@
 
   <!-- Mobile Menu -->
   <div id="seller-mobile-menu"
-       class="md:hidden max-h-0 overflow-hidden opacity-0 transform scale-95 transition-all duration-300 ease-in-out">
-    <a href="{% url 'seller_dashboard' %}" class="block font-bold p-4 text-white hover:text-text-100 hover:bg-accent-100 cursor-pointer">Dashboard</a>
-    <a href="{% url 'manage_products' %}" class="block font-bold p-4 text-white hover:text-text-100 hover:bg-accent-100 cursor-pointer">My Products</a>
-    <a href="{% url 'add_product' %}" class="block font-bold p-4 text-white hover:text-text-100 hover:bg-accent-100 cursor-pointer">Add Product</a>
-    <a href="{% url 'manage_orders' %}" class="block font-bold p-4 text-white hover:text-text-100 hover:bg-accent-100 cursor-pointer">Orders</a>
-    <a href="{% url 'reports' %}" class="block font-bold p-4 text-white hover:text-text-100 hover:bg-accent-100 cursor-pointer">Reports</a>
-    <a href="{% url 'seller_account' %}" id="seller-mobile-account-btn" class="block font-bold p-4 text-white hover:text-text-100 hover:bg-accent-100 cursor-pointer">
-      {% if user.is_authenticated %}
-        {{user.username}}
-      {%else%}
-        Account
-      {%endif%}
-    </a >
-  </div>
+       class="md:hidden max-h-0 overflow-hidden opacity-0 transform scale-95 transition-all duration-300 ease-in-out"></div>
 </nav>
 
 <script>
-  const sellerMenuToggle = document.getElementById('seller-menu-toggle');
-  const sellerMobileMenu = document.getElementById('seller-mobile-menu');
-  const sellerAccountBtn = document.getElementById('seller-account-btn');
-  const sellerMobileAccountBtn = document.getElementById('seller-mobile-account-btn');
+  async function getUser() {
+    try {
+      let res = await get_data(get_User_url); // <-- your user API endpoint
+      if (!res.ok) throw new Error("Failed to load user");
+        return await res.json();
+    } catch (err) {
+      console.error(err);
+      return null;
+    }
+  }
+
+  function buildLinks(user) {
+    const links = [
+      { href: "/seller/dashboard", label: "Dashboard" },
+      { href: "/seller/manage_products", label: "My Products" },
+      { href: "/seller/orders", label: "Orders" },
+      { href: "/seller/reports", label: "Reports" },
+      { href: "/seller/stores", label: "Stores" },
+    ];
+
+    return links;
+  }
+
+  function renderDesktop(links, user) {
+    const container = document.getElementById("seller-desktop-links");
+    container.innerHTML = `
+      ${links.map(link => `
+        <a href="${link.href}" class="text-white hover:text-gray-300 cursor-pointer">${link.label}</a>
+      `).join("")}
+      
+      <!-- Account -->
+      <a href="/seller/account">
+        ${
+          user?.profile_pic 
+          ? `<img src="${user.profile_pic}" class="w-8 h-8 rounded-full object-cover border-2 border-white" />`
+          : `<div class="w-8 h-8 flex items-center justify-center bg-accent-100 text-white rounded-full font-bold">
+              ${(user?.username?.charAt(0) || "?").toUpperCase()}
+            </div>`
+        }
+      </a>
+    `;
+  }
+
+  function renderMobile(links, user) {
+    const container = document.getElementById("seller-mobile-menu");
+    container.innerHTML = `
+      ${links.map(link => `
+        <a href="${link.href}" class="block font-bold p-4 text-white hover:text-text-100 hover:bg-accent-100 cursor-pointer">${link.label}</a>
+      `).join("")}
+      <a href="/seller/account" class="block font-bold p-4 text-white hover:text-text-100 hover:bg-accent-100 cursor-pointer">
+        ${user?.username || "Account"}
+      </a>
+    `;
+  }
+
+  // init
+  (async () => {
+    const user = await get_data(get_User_url);
+    const links = buildLinks(user);
+    renderDesktop(links, user);
+    renderMobile(links, user);
+  })();
 
   // Mobile menu toggle
+  const sellerMenuToggle = document.getElementById('seller-menu-toggle');
+  const sellerMobileMenu = document.getElementById('seller-mobile-menu');
   sellerMenuToggle.addEventListener('click', () => {
     sellerMobileMenu.classList.toggle('max-h-0');
     sellerMobileMenu.classList.toggle('opacity-0');
@@ -69,7 +99,4 @@
     sellerMobileMenu.classList.toggle('opacity-100');
     sellerMobileMenu.classList.toggle('scale-100');
   });
-
-  // Account button click (you can connect this with login/logout or seller account page)
-  
 </script>

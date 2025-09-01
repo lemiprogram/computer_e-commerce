@@ -7,82 +7,80 @@
   <p class="text-text-100 mb-6">Fill in the details below to add a new product to your store.</p>
 
   <!-- Product Form -->
-  <form method="post" enctype="multipart/form-data" class="space-y-6 bg-bg-200 shadow-md rounded-2xl p-6">
+  <form method="post" enctype="multipart/form-data" class="space-y-6 bg-bg-200 shadow-md flex flex-col rounded-2xl p-6">
     {% csrf_token %}
-    
-    <!-- Category -->
-    <div>
-      <label class="block text-sm font-medium mb-1 text-text-100">Category</label>
-      {{ form.category }}
-      {% if form.category.errors %}
-        <p class="text-red-500 text-sm">{{ form.category.errors }}</p>
-      {% endif %}
-    </div>
+       <div class="flex justify-around">
+         <div id="product-info" class="flex flex-col gap-4">
+               <!-- Name -->
+               <div>
+          <label class="block text-sm font-medium mb-1 text-text-100">Product Name</label>
+          {{ form.name }}
+          {% if form.name.errors %}
+            <p class="text-red-500 text-sm">{{ form.name.errors }}</p>
+          {% endif %}
+               </div>
+               <!-- Main Image -->
+               <div>
+          <label class="block text-sm font-medium mb-1 text-text-100">Main Image</label>
+          {{ form.image }}
+          {% if form.image.errors %}
+            <p class="text-red-500 text-sm">{{ form.image.errors }}</p>
+          {% endif %}
+               </div>
+               <!-- Price -->
+               <div>
+          <label class="block text-sm font-medium mb-1 text-text-100">Price</label>
+          {{ form.price }}
+          {% if form.price.errors %}
+            <p class="text-red-500 text-sm">{{ form.price.errors }}</p>
+          {% endif %}
+               </div>
+               <!-- Stock -->
+               <div>
+          <label class="block text-sm font-medium mb-1 text-text-100">Stock</label>
+          {{ form.stock }}
+          {% if form.stock.errors %}
+            <p class="text-red-500 text-sm">{{ form.stock.errors }}</p>
+          {% endif %}
+               </div>
+               <!-- Deal / Discount -->
+               <div>
+          <label class="block text-sm font-medium mb-1 text-text-100">Discount (%)</label>
+          {{ form.discount }}
+          {% if form.discount.errors %}
+            <p class="text-red-500 text-sm">{{ form.discount.errors }}</p>
+          {% endif %}
+               </div>
+             </div> 
+             <div id="product-filters" class="flex flex-col gap-4 ">
+               <!-- Category -->
+               <div>
+          <label class="block text-sm font-medium mb-1 text-text-100">Category</label>
+          {{ form.category }}
+          {% if form.category.errors %}
+            <p class="text-red-500 text-sm">{{ form.category.errors }}</p>
+          {% endif %}
+               </div>
+               <!-- Condition -->
+               <div>
+          <label class="block text-sm font-medium mb-1 text-text-100">Condition</label>
+          {{ form.condition }}
+          {% if form.condition.errors %}
+            <p class="text-red-500 text-sm">{{ form.condition.errors }}</p>
+          {% endif %}
+               </div>
+               <!-- Brand -->
+               <div>
+          <label class="block text-sm font-medium mb-1 text-text-100">Brand</label>
+          {{ form.brand }}
+          {% if form.brand.errors %}
+            <p class="text-red-500 text-sm">{{ form.brand.errors }}</p>
+          {% endif %}
+               </div>
+             </div>
+       </div>
 
-    <!-- Condition -->
-    <div>
-      <label class="block text-sm font-medium mb-1 text-text-100">Condition</label>
-      {{ form.condition }}
-      {% if form.condition.errors %}
-        <p class="text-red-500 text-sm">{{ form.condition.errors }}</p>
-      {% endif %}
-    </div>
 
-    <!-- Brand -->
-    <div>
-      <label class="block text-sm font-medium mb-1 text-text-100">Brand</label>
-      {{ form.brand }}
-      {% if form.brand.errors %}
-        <p class="text-red-500 text-sm">{{ form.brand.errors }}</p>
-      {% endif %}
-    </div>
-
-    <!-- Name -->
-    <div>
-      <label class="block text-sm font-medium mb-1 text-text-100">Product Name</label>
-      {{ form.name }}
-      {% if form.name.errors %}
-        <p class="text-red-500 text-sm">{{ form.name.errors }}</p>
-      {% endif %}
-    </div>
-
-    <!-- Price -->
-    <div>
-      <label class="block text-sm font-medium mb-1 text-text-100">Price</label>
-      {{ form.price }}
-      {% if form.price.errors %}
-        <p class="text-red-500 text-sm">{{ form.price.errors }}</p>
-      {% endif %}
-    </div>
-
-    <!-- Stock -->
-    <div>
-      <label class="block text-sm font-medium mb-1 text-text-100">Stock</label>
-      {{ form.stock }}
-      {% if form.stock.errors %}
-        <p class="text-red-500 text-sm">{{ form.stock.errors }}</p>
-      {% endif %}
-    </div>
-
-    <!-- Main Image -->
-    <div>
-      <label class="block text-sm font-medium mb-1 text-text-100">Main Image</label>
-      {{ form.image }}
-      {% if form.image.errors %}
-        <p class="text-red-500 text-sm">{{ form.image.errors }}</p>
-      {% endif %}
-    </div>
-
-
-
-    <!-- Deal / Discount -->
-    <div>
-      <label class="block text-sm font-medium mb-1 text-text-100">Discount (%)</label>
-      {{ form.discount }}
-      {% if form.discount.errors %}
-        <p class="text-red-500 text-sm">{{ form.discount.errors }}</p>
-      {% endif %}
-    </div>
 
     <!-- Submit Button -->
     <div class="pt-4">

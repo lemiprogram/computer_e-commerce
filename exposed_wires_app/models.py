@@ -3,6 +3,7 @@ from registration.models import CustomUser
 from cloudinary.models import CloudinaryField
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.postgres.fields import ArrayField
+from uuid import uuid4
 
 class  Filter(models.Model):
     key = models.CharField(max_length=32, null=True)
@@ -38,6 +39,7 @@ class Store(models.Model):
     website = models.URLField(blank=True, null=True)
     verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
+    access_token = models.UUIDField(default=uuid4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
