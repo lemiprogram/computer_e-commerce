@@ -89,8 +89,9 @@ def stores(request):
     # Check if user is a seller with a store
     seller = Seller.objects.get(user=request.user)
     store = seller.store 
-
-    return render(request, "sellers/stores.html", {"store": store})
+    staff_members = Seller.objects.filter(store=store)
+    current_seller = Seller.objects.get(user=request.user)
+    return render(request, "sellers/stores.html", {"store": store, 'staff':staff_members, "current_seller":current_seller})
 
 
 def create_store(request):
@@ -138,26 +139,22 @@ def join_store(request):
             return redirect("join_store")
 
         # link seller to store (assuming request.user is seller)
-        seller = getattr(request.user, "seller", None)
-        if not seller:
-            messages.error(request, "You must be a seller to join a store.")
-            return redirect("stores")
+        seller = Seller.objects.get(user=request.user)
 
         seller.store = store
+        seller.store_role = 'staff  '
         seller.save()
         messages.success(request, f"You successfully joined {store.name}.")
         return redirect("stores")
 
     return render(request, "sellers/join_store.html")
 def edit_store(request, pk):
-    seller = getattr(request.user, "seller", None)
-    if not seller or not seller.is_store_admin:
-        messages.error(request, "You don't have permission to edit this store.")
-        return redirect("stores")
-
+    seller = Seller.objects.get(user=request.user)
+    if seller.store_role != 'admin':
+        return redirect('stores')
     store = get_object_or_404(Store, pk=pk)
 
-    # Ensure the store belongs to the admin
+    # Ensure the store belongs to this seller
     if seller.store != store:
         messages.error(request, "You can only edit your own store.")
         return redirect("stores")
@@ -169,12 +166,18 @@ def edit_store(request, pk):
         store.address = request.POST.get("address")
         store.phone = request.POST.get("phone")
         store.website = request.POST.get("website")
-        
+
         if "profile_image" in request.FILES:
             store.profile_image = request.FILES["profile_image"]
 
         store.save()
         messages.success(request, f"Store '{store.name}' updated successfully!")
-        return redirect("store_detail", pk=store.pk)
+        return redirect("stores")
 
-    return render(request, "edit_store.html", {"store": store})
+    # get all staff linked to this store
+    staff_members = Seller.objects.filter(store=store)
+
+    return render(request, "sellers/edit_store.html", {
+        "store": store,
+        "staff_members": staff_members
+    })

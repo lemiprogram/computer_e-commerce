@@ -20,5 +20,6 @@ urlpatterns = [
     path("seller/stores/", stores, name="stores"),
     path("seller/stores/create/", create_store, name="create_store"),
     path("seller/stores/join/", join_store, name="join_store"),
+    path("seller/stores/edit/<int:pk>", edit_store, name="edit_store"),
 ]
                         

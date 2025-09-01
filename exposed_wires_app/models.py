@@ -39,7 +39,7 @@ class Store(models.Model):
     website = models.URLField(blank=True, null=True)
     verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
-    access_token = models.UUIDField(default=uuid4, editable=False, unique=True)
+    access_token = models.UUIDField(default=uuid4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -62,14 +62,14 @@ class Shopper(models.Model):
 
 class Seller(models.Model):
     STORE_ROLES = [
-        ('None','None'),
-        ('Staff','Staff'),
-        ('Admin','Admin'),
+        ('None','none'),
+        ('Staff','staff'),
+        ('Admin','admin'),
 
     ]
 
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name="seller_profile")
-    store = models.OneToOneField(Store, on_delete=models.CASCADE, related_name="seller", null=True, blank=True)
+    store = models.ForeignKey(Store, on_delete=models.CASCADE, related_name="seller", null=True, blank=True)
     store_role = models.CharField(max_length=16, choices=STORE_ROLES, default="None")
     city = models.CharField(max_length=100, blank=True, null=True)
     phone = models.CharField(max_length=20, blank=True, null=True)
