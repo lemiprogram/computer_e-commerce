@@ -87,8 +87,8 @@ def seller_account(request):
     return render(request, "sellers/account.html")
 def stores(request):
     # Check if user is a seller with a store
-    seller = getattr(request.user, "seller", None)
-    store = seller.store if seller and hasattr(seller, "store") else None
+    seller = Seller.objects.get(user=request.user)
+    store = seller.store 
 
     return render(request, "sellers/stores.html", {"store": store})
 
@@ -119,25 +119,62 @@ def create_store(request):
         # Link store to seller
         seller, _ = Seller.objects.get_or_create(user=request.user)
         seller.store = store
+        seller.store_role = 'admin'
         seller.save()
 
         messages.success(request, f"Store '{store.name}' created successfully!")
         return redirect("stores")
 
-    return render(request, "create_store.html")
+    return render(request, "sellers/create_store.html")
 
 
 def join_store(request):
     if request.method == "POST":
-        store_id = request.POST.get("store_id")
-        store = get_object_or_404(Store, id=store_id)
+        token = request.POST.get("access_token")
+        try:
+            store = Store.objects.get(access_token=token)
+        except Store.DoesNotExist:
+            messages.error(request, "Invalid store token. Please try again.")
+            return redirect("join_store")
 
-        seller, _ = Seller.objects.get_or_create(user=request.user)
+        # link seller to store (assuming request.user is seller)
+        seller = getattr(request.user, "seller", None)
+        if not seller:
+            messages.error(request, "You must be a seller to join a store.")
+            return redirect("stores")
+
         seller.store = store
         seller.save()
-
-        messages.success(request, f"You have joined '{store.name}' successfully!")
+        messages.success(request, f"You successfully joined {store.name}.")
         return redirect("stores")
 
-    stores = Store.objects.all()
-    return render(request, "join_store.html", {"stores": stores})
+    return render(request, "sellers/join_store.html")
+def edit_store(request, pk):
+    seller = getattr(request.user, "seller", None)
+    if not seller or not seller.is_store_admin:
+        messages.error(request, "You don't have permission to edit this store.")
+        return redirect("stores")
+
+    store = get_object_or_404(Store, pk=pk)
+
+    # Ensure the store belongs to the admin
+    if seller.store != store:
+        messages.error(request, "You can only edit your own store.")
+        return redirect("stores")
+
+    if request.method == "POST":
+        store.name = request.POST.get("name")
+        store.description = request.POST.get("description")
+        store.city = request.POST.get("city")
+        store.address = request.POST.get("address")
+        store.phone = request.POST.get("phone")
+        store.website = request.POST.get("website")
+        
+        if "profile_image" in request.FILES:
+            store.profile_image = request.FILES["profile_image"]
+
+        store.save()
+        messages.success(request, f"Store '{store.name}' updated successfully!")
+        return redirect("store_detail", pk=store.pk)
+
+    return render(request, "edit_store.html", {"store": store})
