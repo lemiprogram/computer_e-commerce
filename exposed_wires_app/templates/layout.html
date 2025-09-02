@@ -9,16 +9,16 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style type="text/tailwindcss">      
         @theme {
-    --color-primary-100:#1E2022;
-    --color-primary-200:#34373b;
-    --color-primary-300:#F0F5F9;
-    --color-accent-100:#788189;
-    --color-accent-200:#e1e4e6;
-    --color-text-100:#1E2022;
-    --color-text-200:#52616B;
-    --color-bg-100:#F0F5F9;
-    --color-bg-200:#C9D6DF;
-    --color-bg-300:#bfc7d1;
+    --color-primary-100:#005B99;
+    --color-primary-200:#4e88ca;
+    --color-primary-300:#b7e9ff;
+    --color-accent-100:#FFD700;
+    --color-accent-200:#e9aa2b;
+    --color-text-100:#333333;
+    --color-text-200:#5c5c5c;
+    --color-bg-100:#F5F5F5;
+    --color-bg-200:#ebebeb;
+    --color-bg-300:#c2c2c2;
       
       
       
@@ -135,6 +135,8 @@ async function delete_data(url) {
         const get_CustomUser_url = `${BASE_URL}/api/get/Customusers/`;
         const get_User_url = `${BASE_URL}/api/get/user`;
 
+        const post_CartItems_url = `${BASE_URL}/api/post/CartItems/`
+
         const delete_CustomUser_url = `${BASE_URL}/api/delete/Customusers/`;
         const delete_Products_url = `${BASE_URL}/api/delete/Products/`;
 
@@ -165,12 +167,12 @@ async function delete_data(url) {
     {% endblock %}
 
     {% if user.role == "admin" %}
-        <main class="min-h-screen w-screen flex">
+        <main class="min-h-screen flex">
             {% include 'includes/admin_sidbar.html' %}
             <section class="w-full h-screen overflow-y-scroll">{% block admin_content %}{% endblock %}</section>
         </main>
         {% endif %}
-        <main class="w-screen">{% block content %}{% endblock %}</main>
+        <main class="">{% block content %}{% endblock %}</main>
 
     {% block footer %}
         {% if user.role != "admin" %}

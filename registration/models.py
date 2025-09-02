@@ -47,10 +47,12 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         super().save(*args, **kwargs)
 
         # Import inside method to avoid circular import
-        from exposed_wires_app.models import Seller,Shopper
+        from exposed_wires_app.models import Seller,Shopper,Cart
 
         if is_new:
             if self.role == "shopper":
                 Shopper.objects.create(user = self)
+                shopper = Shopper.objects.get(user= self)
+                Cart.objects.create(shopper=shopper)
             if self.role == "seller":
                 Seller.objects.create(user = self)

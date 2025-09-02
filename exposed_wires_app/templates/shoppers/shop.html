@@ -33,17 +33,17 @@
     category_product_card_holder.classList.add('flex','overflow-x-scroll','overflow-y-none','px-3','py-5')
     
     category_product_card_holder.innerHTML += category_products.map((product, index)=>index<10?`
-            <a href='' class="relative overflow-hidden cursor-pointer bg-bg-200 min-w-[180px] w-[180px] max-h-[200px] rounded-2xl shadow-lg items-center transition-transform transform hover:scale-105">
-            ${product.discount ? '<span class=" font-semibold absolute top-0 right-0 p-1 bg-primary-300 text-white rounded-es-lg rounded-se-lg">-'+product.discount+'%</span>':""}
+            <a href='/products/${product.id}' class="relative overflow-hidden cursor-pointer bg-bg-200 min-w-[180px] w-[180px] max-h-[200px] rounded-2xl shadow-lg flex flex-col items-center transition-transform transform hover:scale-105">
+            ${product.discount ? '<span class=" font-semibold absolute top-0 right-0 p-1 bg-accent-100 text-white rounded-es-lg rounded-se-lg">-'+product.discount+'%</span>':""}
             <!-- Product Image -->
             <img src="http://res.cloudinary.com/duxorzcjg/${product.image}" alt="${product.name}" class="h-48 w-full object-scale-down rounded-lg mb-4">
 
             <!-- Product Info -->
-            <div class=" w-full h-full flex flex-col justify-end absolute bottom-0 hover:bg-faded-grey">
-              <h3 class="text-sm font-semibold text-text-100 mb-2">${ product.name }</h3>
+            <div class=" w-full h-full flex flex-col justify-end absolute top-0 hover:bg-faded-grey">
+              <h3 class="text-md font-semibold text-primary-100 capitalize font-bold  mb-2">${ product.name }</h3>
               <div class="flex gap-1 items-center justify-center ">
                 <span class="text-sm ${product.discount ? ' line-through decoration-2 decoration-text-200 self-start text-text-200': ' text-text-100 '} font-bold">$${product.price}</span>
-                ${product.discount?'<span class="text-lg font-bold text-primary-300 ">$'+getPrice(product.price,product.discount)+'</span>':''}
+                ${product.discount?'<span class="text-lg font-bold text-accent-200 ">$'+getPrice(product.price,product.discount)+'</span>':''}
               </div>
               
             </div>

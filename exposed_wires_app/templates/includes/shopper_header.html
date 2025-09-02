@@ -34,7 +34,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 9m12-9l2 9m-6-9v9" />
           </svg>
-          <span class="absolute -top-2 -right-2 bg-primary-200 text-white text-xs rounded-full px-1">0</span>
+          <span class="absolute -top-2 -right-2 bg-primary-200 text-white text-xs rounded-full px-1" id="dektop-quantity"></span>
         </button>
 
         <!-- Cart Menu -->
@@ -43,7 +43,8 @@
           <h3 class="font-bold mb-2">Shopping Cart</h3>
           
           <!-- Example Items -->
-          X
+          <div id="desktop-items" class="flex flex-col">
+          </div>
           
           <!-- Divider -->
           <hr class="my-2">
@@ -51,7 +52,7 @@
           <!-- Total -->
           <div class="flex justify-between font-bold">
             <span>Total</span>
-            <span id="desktop-">$100</span>
+            <span id="desktop-total">$100</span>
           </div>
 
           <!-- Checkout -->
@@ -222,4 +223,58 @@
       loginModal.classList.add('hidden');
     }
   });
+  async function set_cart(){
+    const [desktopItemsSpan, desktopTotalSpan, desktopQuantity] = [document.getElementById("desktop-items"), document.getElementById("desktop-total") , document.getElementById("dektop-quantity")]
+    const [mobileItemsSpan, mobileTotalSpan] = [document.getElementById("mobile-items"), document.getElementById("mobile-total") ]
+    try{
+
+      const user = await fetch(get_User_url)
+      .then(res=>res.json())
+      .then(data=>data)
+      console.log(user)
+      const shopper = await get_data(get_Shoppers_url+user.id)
+      const cart = await get_data(get_Carts_url+shopper.cart)
+      const cartItems = await get_data(get_CartItems_url)
+      let items = cartItems.filter(item=>item.cart==cart.id)
+      let total = 0
+      let items_html = ""
+      let items_count = 0
+      items.forEach(item=>{
+        items_count+=item.quantity
+        total+=item.quantity*item.product_price
+        items_html+=`<div class="flex justify-between mb-2">
+                        <span>${item.product_name} x${item.quantity}</span>
+                        <span>$${item.product_price*item.quantity}</span>
+                      </div>`
+                    })
+                    desktopQuantity.innerText = items_count
+                    desktopItemsSpan.innerHTML = items_html
+                    desktopTotalSpan.innerText = "$"+total
+                    mobileItemsSpan.innerText = items.length + (items.length==1?" item":" items")
+      mobileTotalSpan.innerText = total
+      
+    }
+    catch(err){
+      const cart = localStorage.getItem("cart")?JSON.parse(localStorage.getItem("cart")):{}
+      let items_html = ""
+      let total = 0
+      let items_count = 0
+      for(const item in cart){
+        items_count+=cart[item].quantity
+        total+=cart[item].quantity*cart[item].price
+        items_html+=`<div class="flex justify-between mb-2">
+                        <span>${cart[item].name} x${cart[item].quantity}</span>
+                        <span>$${cart[item].price*cart[item].quantity}</span>
+                      </div>`
+      }
+      desktopQuantity.innerText = items_count
+      desktopItemsSpan.innerHTML = items_html
+      desktopTotalSpan.innerText = "$"+total
+      mobileItemsSpan.innerText = items_count + (items_count==1?" item":" items")
+      mobileTotalSpan.innerText = total
+
+    }
+
+  }
+  set_cart()
 </script>

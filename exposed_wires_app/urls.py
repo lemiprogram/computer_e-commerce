@@ -8,6 +8,7 @@ urlpatterns = [
     path('account/', account, name='account'),
     path('wishlist/', wishlist, name='wishlist'),
     path('deals/', deals, name='deals'),
+    path("products/<int:pk>/", product_detail_view, name="product_detail"),
     path("categories/", category_list, name="category_list"),
     path("categories/<str:category_name>/", category_detail, name="category_detail"),
     path("seller/dashboard/", seller_dashboard, name="seller_dashboard"),

@@ -1,0 +1,179 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="min-h-screen bg-bg-100 py-10">
+    <div class="max-w-5xl mx-auto bg-bg-300 shadow-xl rounded-2xl p-8">
+        
+        <!-- Product Header -->
+        <div class="flex flex-col md:flex-row gap-8">
+            <!-- Image -->
+            <div class="flex-shrink-0 w-full md:w-1/2">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}"
+                         class="rounded-2xl shadow-md w-full object-cover">
+                {% else %}
+                    <div class="w-full h-64 bg-bg-200 rounded-2xl flex items-center justify-center text-text-200 text-lg">
+                        No Image
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Info -->
+            <div class="flex-1">
+                <h1 class="text-3xl font-bold text-text-100 mb-3">{{ product.name }}</h1>
+                
+                {% if product.brand %}
+                    <p class="text-text-200 mb-2">Brand: <span class="font-semibold">{{ product.brand }}</span></p>
+                {% endif %}
+
+                {% if product.category %}
+                    <p class="text-text-200 mb-2">Category: <span class="font-semibold">{{ product.category.name }}</span></p>
+                {% endif %}
+
+                {% if product.condition %}
+                    <p class="text-text-200 mb-2">Condition: <span class="font-semibold">{{ product.condition.name }}</span></p>
+                {% endif %}
+
+                <p class="text-2xl font-bold text-primary-200 mt-4">
+                    ${{ price }}
+                    {% if product.discount and product.discount > 0 %}
+                        <span class="text-lg line-through text-text-200 ml-2">
+                            ${{ product.price|floatformat:2|add:""|default:"" }}
+                        </span>
+                        <span class="ml-2 px-2 py-1 bg-accent-200 text-white rounded-lg text-sm">
+                            -{{ product.discount }}%
+                        </span>
+                    {% endif %}
+                </p>
+
+                <p class="mt-2 text-text-200">Stock: 
+                    {% if product.stock > 0 %}
+                        <span class="text-priamry-100 font-semibold">{{ product.stock }}</span>
+                    {% else %}
+                        <span class="text-accent-1004 font-semibold">Out of stock</span>
+                    {% endif %}
+                </p>
+
+                <div class="mt-6 flex gap-4">
+                    <!-- Add to Cart Button -->
+<button id="add-to-cart-btn"
+        data-product-id="{{ product.id }}"
+        class="bg-primary-200 hover:bg-primary-100 text-white px-6 py-2 rounded-lg">
+    Add to Cart
+</button>
+
+<!-- Quantity Controls (hidden initially) -->
+<div id="cart-quantity-controls" class="hidden flex items-center space-x-4 mt-4">
+    <button id="decrease-qty" class="bg-gray-300 px-3 py-1 rounded">-</button>
+    <span id="cart-quantity" class="font-bold text-lg">1</span>
+    <button id="increase-qty" class="bg-gray-300 px-3 py-1 rounded">+</button>
+</div>
+                    <button class="bg-accent-200 hover:bg-accent-100 text-white px-6 py-3 rounded-lg shadow-md">
+                        Buy Now
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Extra Info -->
+        <div class="mt-10">
+            <h2 class="text-xl font-semibold text-text-100 mb-4">Product Information</h2>
+            <p class="text-text-200 leading-relaxed">
+                {% if product.description %}
+                    {{ product.description }}
+                {% else %}
+                    No additional details available for this product.
+                {% endif %}
+            </p>
+        </div>
+
+        <!-- Seller Info -->
+        <div class="mt-10 bg-bg-200 p-6 rounded-xl shadow-md">
+            <h3 class="text-lg font-semibold text-text-100 mb-3">Seller Information</h3>
+            <p class="text-text-200"><span class="font-semibold">Seller:</span> {{ product.seller.user.username }}</p>
+            {% if product.seller.store %}
+                <p class="text-text-200"><span class="font-semibold">Store:</span> {{ product.seller.store.name }}</p>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+{%block scripts%}
+<script>
+    (() => {
+    const addToCartBtn = document.getElementById("add-to-cart-btn");
+    const quantityControls = document.getElementById("cart-quantity-controls");
+    const qtyDisplay = document.getElementById("cart-quantity");
+
+    if (!addToCartBtn) return; // Not on product detail page
+
+    const productId = addToCartBtn.dataset.productId; // ✅ from data attribute
+    let cartItemId = null;
+    let quantity = 1;
+
+    // Add to Cart
+    addToCartBtn.addEventListener("click", async () => {
+        const data = await post_data(post_CartItem_url, {
+            product_id: productId,
+            quantity: 1,
+        });
+        console.log(data)
+
+        if (data && data.success) {
+            notify("Added to cart", "success");
+            cartItemId = data.item_id;
+            quantity = 1;
+            qtyDisplay.textContent = quantity;
+
+            addToCartBtn.classList.add("hidden");
+            quantityControls.classList.remove("hidden");
+        } else {
+            notify("Failed to add to cart", "error");
+        }
+    });
+
+    // Increase Quantity
+    document.getElementById("increase-qty")?.addEventListener("click", async () => {
+        quantity++;
+        const data = await patch_data(`${BASE_URL}/api/update-cart-item/${cartItemId}/`, {
+            quantity: quantity
+        });
+
+        if (data && data.success) {
+            qtyDisplay.textContent = quantity;
+        } else {
+            notify("Failed to update quantity", "error");
+        }
+    });
+
+    // Decrease Quantity
+    document.getElementById("decrease-qty")?.addEventListener("click", async () => {
+        if (quantity > 1) {
+            quantity--;
+            const data = await patch_data(`${BASE_URL}/api/update-cart-item/${cartItemId}/`, {
+                quantity: quantity
+            });
+
+            if (data && data.success) {
+                qtyDisplay.textContent = quantity;
+            } else {
+                notify("Failed to update quantity", "error");
+            }
+        } else {
+            const data = await delete_data(`${BASE_URL}/api/delete-cart-item/${cartItemId}/`);
+
+            if (data && data.success) {
+                notify("Item removed from cart", "info");
+                quantity = 1;
+                cartItemId = null;
+
+                quantityControls.classList.add("hidden");
+                addToCartBtn.classList.remove("hidden");
+            }
+        }
+    });
+})();
+
+</script>
+{%endblock%}

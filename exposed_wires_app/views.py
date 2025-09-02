@@ -13,7 +13,6 @@ def home(request):
 
 def shop(request):
     context = {
-        'product':Product.objects.get(pk=7)
     }
     if request.user.is_authenticated:
         if hasattr(request.user, "shopper_profile"):
@@ -47,6 +46,19 @@ def category_detail(request, category_name):
     return render(request, "shoppers/category_detail.html", {
         "category": category,
         "products": products
+    })
+def product_detail_view(request, pk):
+    """
+    Product detail page
+    """
+    product = get_object_or_404(Product, pk=pk)
+
+    product.clicks += 1
+    product.save()
+
+    return render(request, "shoppers/product_detail.html", {
+        "product": product,
+        'price':float(product.price) * (1 - (product.discount / 100))
     })
 def wishlist(request):
     return render(request, 'shoppers/wishlist.html')
@@ -84,7 +96,28 @@ def manage_orders(request):
 def reports(request):
     return render(request, 'sellers/reports.html')
 def seller_account(request):
-    return render(request, "sellers/account.html")
+    seller = Seller.objects.get(user=request.user)
+    if request.method == "POST":
+        # ----- Profile update -----
+        if "username" in request.POST and 'email' in request.POST:
+            username = request.POST.get("username")
+            email = request.POST.get("email")
+            phone = request.POST.get("phone")
+            profile_pic = request.FILES.get("profile_image")
+
+            # update user model
+            user = request.user
+            user.username = username
+            user.email = email
+            if profile_pic:
+                seller.profile_image = profile_pic
+            seller.phone = phone
+            seller.save()
+            user.save()
+
+            messages.success(request, "Profile updated successfully ✅")
+            return redirect("seller_dashboard")
+    return render(request, "sellers/account.html",{'seller':seller})
 def stores(request):
     # Check if user is a seller with a store
     seller = Seller.objects.get(user=request.user)

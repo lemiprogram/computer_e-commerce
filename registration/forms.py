@@ -44,14 +44,7 @@ class ShopperForm(forms.ModelForm):
 
 
 class SellerForm(forms.ModelForm):
-    store = forms.ModelChoiceField(
-        queryset=Store.objects.all(),
-        required=False,
-        widget=forms.Select(attrs={
-            "class": INPUT_CLASS
-        })
-    )
-
+    
     city = forms.CharField(
         max_length=100,
         required=False,
