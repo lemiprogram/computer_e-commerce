@@ -1,24 +1,65 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="max-w-6xl mx-auto px-6 py-10">
-  <h2 class="text-2xl font-bold text-primary-200 mb-6">
-    {{ category.name }}
-  </h2>
+<div class="container mx-auto px-6 py-10">
+  <!-- Header -->
+  <h1 class="text-2xl font-bold text-center mb-8 text-primary-100">
+    Products in {{ category.name }}
+  </h1>
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+  <!-- Products Grid -->
+  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
     {% for product in products %}
-      <div class="bg-bg-300 p-4 rounded-lg shadow-md hover:shadow-lg transition">
-        {% if product.image %}
-          <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-40 object-cover rounded-md mb-4">
+      <a href="{% url 'product_detail' product.id %}" 
+         class="relative overflow-hidden cursor-pointer bg-bg-200 min-w-[180px] w-[180px] max-h-[200px] rounded-2xl shadow-lg flex flex-col items-center transition-transform transform hover:scale-105">
+
+        <!-- Discount Badge -->
+        {% if product.discount %}
+          <span class="font-semibold absolute top-0 right-0 p-1 bg-accent-100 text-white rounded-es-lg rounded-se-lg">
+            -{{ product.discount }}%
+          </span>
         {% endif %}
-        <h3 class="text-lg font-semibold text-text-100">{{ product.name }}</h3>
-        <p class="text-primary-200 font-bold mt-2">${{ product.price }}</p>
-        <p class="text-sm text-text-200">Stock: {{ product.stock }}</p>
-      </div>
+
+        <!-- Product Image -->
+        {% if product.image %}
+          <img src="{{ product.image.url }}" 
+               alt="{{ product.name }}" 
+               class="h-48 w-full object-scale-down rounded-lg mb-4">
+        {% else %}
+          <div class="h-48 w-full flex items-center justify-center bg-gray-200 text-gray-500 rounded-lg mb-4">
+            No Image
+          </div>
+        {% endif %}
+
+        <!-- Product Info -->
+        <div class="w-full h-full flex flex-col justify-end absolute top-0 hover:bg-faded-grey p-2">
+          <h3 class="text-md font-semibold text-primary-100 capitalize font-bold mb-2">
+            {{ product.name }}
+          </h3>
+          <div class="flex gap-1 items-center justify-center">
+            <span class="text-sm 
+                          {% if product.discount %}
+                            line-through decoration-2 decoration-text-200 self-start text-text-200
+                          {% else %}
+                            text-text-100
+                          {% endif %}
+                          font-bold">
+              ${{ product.price }}
+            </span>
+
+            {% if product.discount %}
+              <span class="text-lg font-bold text-accent-200">
+                ${{ product.get_discounted_price }}
+              </span>
+            {% endif %}
+          </div>
+        </div>
+      </a>
     {% empty %}
-      <p class="text-text-200">No products in this category yet.</p>
+      <p class="col-span-full text-center text-gray-500">
+        No products found in this category.
+      </p>
     {% endfor %}
   </div>
 </div>
-{% endblock content %}
+{% endblock %}

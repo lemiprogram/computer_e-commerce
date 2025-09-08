@@ -142,8 +142,8 @@ async function delete_data(url) {
         const delete_CartItems_url = `${BASE_URL}/api/delete/CartItems/`;
         
         function getPrice(priceStr, discount){
-            let price = parseFloat(priceStr)
-            price = price * (1 - (discount / 100))
+            let price = Math.round(parseFloat(priceStr)*100) / 100;
+            price = (price * (1 - (discount / 100)))
             return price.toFixed(2);
         }
     </script>

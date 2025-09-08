@@ -103,7 +103,11 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
-
+    def get_discounted_price(self):
+        if self.discount:
+            price = float(self.price)
+            return round(price - (price * self.discount / 100), 2)
+        return self.price
 
 class Order(models.Model):
     STATUS_CHOICES = [
