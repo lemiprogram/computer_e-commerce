@@ -66,14 +66,8 @@ function notify(message, type = "info") {
 }
 // GET
 async function get_data(url) {
-    try {
-        const res = await fetch(url);
-        if (!res.ok) throw new Error("Failed to fetch data");
-        return await res.json();
-    } catch (err) {
-        notify(err.message, "error");
-        return null;
-    }
+    const res = await fetch(url);
+    return await res.json();
 }
 
 // POST
@@ -85,7 +79,8 @@ async function post_data(url, postData) {
             "X-CSRFToken": getCSRFToken()
         },
         body: JSON.stringify(postData)
-    }).then(res => res.json());
+    }).then(res => res.json())
+      .then(data => data);
 }
 
 async function put_data(url, putData) {
@@ -107,7 +102,8 @@ async function patch_data(url, patchData) {
             "X-CSRFToken": getCSRFToken()
         },
         body: JSON.stringify(patchData)
-    }).then(res => res.json());
+    }).then(res => res.json())
+      .then(data => data);
 }
 
 async function delete_data(url) {
@@ -135,14 +131,20 @@ async function delete_data(url) {
         const get_CustomUser_url = `${BASE_URL}/api/get/Customusers/`;
         const get_User_url = `${BASE_URL}/api/get/user`;
 
-        const post_CartItems_url = `${BASE_URL}/api/post/CartItems/`
+        
+
+        const post_CartItems_url = `${BASE_URL}/api/post/CartItems`
+        const patch_CartItems_url = `${BASE_URL}/api/patch/CartItems/`
+        
 
         const delete_CustomUser_url = `${BASE_URL}/api/delete/Customusers/`;
         const delete_Products_url = `${BASE_URL}/api/delete/Products/`;
-
+        const delete_CartItems_url = `${BASE_URL}/api/delete/CartItems/`;
+        
         function getPrice(priceStr, discount){
-            price = parseFloat(priceStr)
-            return price * (1 - (discount / 100))
+            let price = parseFloat(priceStr)
+            price = price * (1 - (discount / 100))
+            return price.toFixed(2);
         }
     </script>
     {% if messages %}

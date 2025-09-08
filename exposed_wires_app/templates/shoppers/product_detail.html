@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="min-h-screen bg-bg-100 py-10">
-    <div class="max-w-5xl mx-auto bg-bg-300 shadow-xl rounded-2xl p-8">
+    <div class="max-w-5xl mx-auto bg-bg-100 shadow-xl rounded-2xl p-8">
         
         <!-- Product Header -->
         <div class="flex flex-col md:flex-row gap-8">
@@ -101,79 +101,154 @@
 {% endblock %}
 {%block scripts%}
 <script>
-    (() => {
+    (async () => {
     const addToCartBtn = document.getElementById("add-to-cart-btn");
     const quantityControls = document.getElementById("cart-quantity-controls");
     const qtyDisplay = document.getElementById("cart-quantity");
 
     if (!addToCartBtn) return; // Not on product detail page
 
-    const productId = addToCartBtn.dataset.productId; // ✅ from data attribute
+    const productId = addToCartBtn.dataset.productId; 
+    let cart = null;
     let cartItemId = null;
     let quantity = 1;
+    let product = await get_data(get_Products_url+productId);
+    try {
+    const user = await get_data(get_User_url);
+    if (!user) throw new Error("Not logged in");
+    let shoppers = await get_data(get_Shoppers_url+0);
+    let shopper = shoppers.find(s => s.user == user.id);
+    if (!shopper) throw new Error("No shopper profile found");
 
-    // Add to Cart
-    addToCartBtn.addEventListener("click", async () => {
-        const data = await post_data(post_CartItem_url, {
-            product_id: productId,
-            quantity: 1,
-        });
-        console.log(data)
+    let carts = await get_data(get_Carts_url+0);
+    cart = carts.find(c => c.shopper == shopper.id);
+    if (!cart) throw new Error("No cart found for shopper");
 
-        if (data && data.success) {
-            notify("Added to cart", "success");
-            cartItemId = data.item_id;
-            quantity = 1;
-            qtyDisplay.textContent = quantity;
+    let cartItems = await get_data(get_CartItems_url +0);
+    cartItems = cartItems.filter(item => item.cart == cart.id);
 
-            addToCartBtn.classList.add("hidden");
-            quantityControls.classList.remove("hidden");
-        } else {
-            notify("Failed to add to cart", "error");
+    // If this product is already in cart, preload values
+    const existingItem = cartItems.find(item => item.product == productId);
+    if (existingItem) {
+        cartItemId = existingItem.id;
+        quantity = existingItem.quantity;
+        qtyDisplay.textContent = quantity;
+        addToCartBtn.classList.add("hidden");
+        quantityControls.classList.remove("hidden");
+    }
+        
+    } catch (error) {
+        setTimeout(() => {
+            openLoginModal();
+        }, 1000);
+    }
+    
+   addToCartBtn.addEventListener("click", async function () {
+    let cartItemData = {
+        cart: cart.id,
+        product: productId,
+        quantity: 1,
+    };
+
+    try {
+        // If item already exists, just update quantity
+        if (existingItem) {
+            cartItemId = existingItem.id;
+            quantity = existingItem.quantity + 1;
+
+            const data = await patch_data(patch_CartItems_url + cartItemId, { quantity });
+
+            if (data) {
+                updateCartUI();
+            }
+            return;
         }
-    });
 
-    // Increase Quantity
-    document.getElementById("increase-qty")?.addEventListener("click", async () => {
+        // Create a new cart item
+        const postCartItemsData = await post_data(post_CartItems_url, cartItemData);
+
+        if (postCartItemsData && (postCartItemsData.id || postCartItemsData.pk)) {
+            cartItemId = postCartItemsData.id || postCartItemsData.pk;
+            updateCartUI();
+        } else {
+            notify("Failed to add product to cart", "error");
+        }
+    } catch (err) {
+        console.error("Add to cart error:", err);
+        notify("Error adding to cart", "error");
+    }
+});
+
+// ✅ Extracted UI updater (no duplication)
+function updateCartUI() {
+    set_cart();
+    notify("Added to cart", "success");
+    qtyDisplay.textContent = quantity;
+    addToCartBtn.classList.add("hidden");
+    quantityControls.classList.remove("hidden");
+}
+
+    document.getElementById("increase-qty")?.addEventListener("click", async function (){
+        if (parseInt(product.stock) <= quantity) {
+            notify("No more stock available", "error");
+            return;
+        }
         quantity++;
-        const data = await patch_data(`${BASE_URL}/api/update-cart-item/${cartItemId}/`, {
-            quantity: quantity
-        });
-
-        if (data && data.success) {
-            qtyDisplay.textContent = quantity;
-        } else {
-            notify("Failed to update quantity", "error");
+        try{
+            const data = await patch_data(patch_CartItems_url+cartItemId, { quantity });
+            
         }
+        catch(err){
+            
+         setTimeout(()=>{
+            set_cart()
+            notify("Quantity increased", "success");
+            qtyDisplay.textContent = quantity;
+        },0)
+    }
     });
 
-    // Decrease Quantity
     document.getElementById("decrease-qty")?.addEventListener("click", async () => {
         if (quantity > 1) {
             quantity--;
-            const data = await patch_data(`${BASE_URL}/api/update-cart-item/${cartItemId}/`, {
-                quantity: quantity
-            });
-
-            if (data && data.success) {
-                qtyDisplay.textContent = quantity;
-            } else {
-                notify("Failed to update quantity", "error");
+            try{
+            const data = await patch_data(patch_CartItems_url+cartItemId, { quantity });
+            
+                }
+            catch(err){
+                    
+                setTimeout(()=>{
+                    set_cart()
+                    notify("Quantity decreased", "success");
+                    qtyDisplay.textContent = quantity;
+                    addToCartBtn.classList.add("hidden");
+                    quantityControls.classList.remove("hidden");
+                },0)
             }
-        } else {
-            const data = await delete_data(`${BASE_URL}/api/delete-cart-item/${cartItemId}/`);
+            return
+        } 
+        try{
+        const data = await delete_data(delete_CartItems_url+cartItemId);
+        }catch(err){
 
-            if (data && data.success) {
-                notify("Item removed from cart", "info");
-                quantity = 1;
-                cartItemId = null;
+            
+    setTimeout(()=>{
+        notify("Item removed from cart", "info");
+        quantity = 1;
+        qtyDisplay.textContent = quantity;
+        addToCartBtn.classList.remove("hidden");
+        quantityControls.classList.add("hidden");
+        set_cart()  
+    },0)
 
-                quantityControls.classList.add("hidden");
-                addToCartBtn.classList.remove("hidden");
-            }
-        }
+            
+    }
+        
+            
+        
     });
 })();
+
 
 </script>
 {%endblock%}

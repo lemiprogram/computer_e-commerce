@@ -54,5 +54,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
                 Shopper.objects.create(user = self)
                 shopper = Shopper.objects.get(user= self)
                 Cart.objects.create(shopper=shopper)
-            if self.role == "seller":
+            elif self.role == "seller":
                 Seller.objects.create(user = self)
+            else:
+                self.is_staff = True
+                self.is_superuser = True

@@ -83,7 +83,7 @@
   // === Newest SELLERS ===
   for (let shopper of shoppers.slice(-5)){
     user = await get_data(get_CustomUser_url+shopper.user)
-    document.getElementById("Newest-sellers").innerHTML +=`
+    document.getElementById("Newest-shoppers").innerHTML +=`
     <li class="flex justify-between">
       <span>${user.username}</span>
       <span class="text-xs text-text-200">${user.email}</span>
@@ -104,7 +104,7 @@
   // === Newest STORES ===
   document.getElementById("Newest-stores").innerHTML = stores.slice(-4).map(store => `
     <li class="p-4 border rounded-lg flex items-center gap-3">
-      <img src="${store.image || '/static/images/store-placeholder.png'}" class="w-12 h-12 object-cover rounded-lg">
+      <img src="${store.image}" class="w-12 h-12 object-cover rounded-lg">
       <div>
         <h4 class="font-semibold text-text-100">${store.name}</h4>
         <p class="text-xs text-text-200">Owner: ${store.seller.user.username}</p>

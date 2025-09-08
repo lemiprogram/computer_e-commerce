@@ -34,7 +34,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 9m12-9l2 9m-6-9v9" />
           </svg>
-          <span class="absolute -top-2 -right-2 bg-primary-200 text-white text-xs rounded-full px-1" id="dektop-quantity"></span>
+          <span class="absolute -top-2 -right-2 bg-primary-200 text-white text-xs rounded-full px-1" id="dektop-quantity">0</span>
         </button>
 
         <!-- Cart Menu -->
@@ -52,7 +52,7 @@
           <!-- Total -->
           <div class="flex justify-between font-bold">
             <span>Total</span>
-            <span id="desktop-total">$100</span>
+            <span id="desktop-total">$0</span>
           </div>
 
           <!-- Checkout -->
@@ -187,30 +187,21 @@
     }
   });
 
+  const openLoginModal = () => {
+    if (isAuthenticated !== 'False'){
+      location.href = "/account/"
+      return
+    }
+    if(location.pathname.includes("accounts")){
+      location.href = "/accounts/sign_in"
+      return
+    }
+    loginModal.classList.remove('hidden');
+  }
   // Open login modal
-  accountBtn.addEventListener('click', () => {
-    if (isAuthenticated !== 'False'){
-      location.href = "/account/"
-      return
-    }
-    if(location.pathname.includes("accounts")){
-      location.href = "/accounts/sign_in"
-      return
-    }
-    loginModal.classList.remove('hidden');
-  });
+  accountBtn.addEventListener('click', openLoginModal);
 
-  mobileAccountBtn.addEventListener('click', () => {
-    if (isAuthenticated !== 'False'){
-      location.href = "/account/"
-      return
-    }
-    if(location.pathname.includes("accounts")){
-      location.href = "/accounts/sign_in"
-      return
-    }
-    loginModal.classList.remove('hidden');
-  });
+  mobileAccountBtn.addEventListener('click', openLoginModal);
 
   // Close login modal
   closeModal.addEventListener('click', () => {
@@ -224,6 +215,7 @@
     }
   });
   async function set_cart(){
+    console.log("Setting cart")
     const [desktopItemsSpan, desktopTotalSpan, desktopQuantity] = [document.getElementById("desktop-items"), document.getElementById("desktop-total") , document.getElementById("dektop-quantity")]
     const [mobileItemsSpan, mobileTotalSpan] = [document.getElementById("mobile-items"), document.getElementById("mobile-total") ]
     try{
@@ -231,40 +223,43 @@
       const user = await fetch(get_User_url)
       .then(res=>res.json())
       .then(data=>data)
-      console.log(user)
-      const shopper = await get_data(get_Shoppers_url+user.id)
-      const cart = await get_data(get_Carts_url+shopper.cart)
-      const cartItems = await get_data(get_CartItems_url)
+      let shopper = await get_data(get_Shoppers_url+0)
+      shopper = shopper.find(s => s.user == user.id)
+      let cart = await get_data(get_Carts_url+0)
+      cart = cart.find(c=>c.shopper==shopper.id)
+
+      let cartItems = await get_data(get_CartItems_url+0)
       let items = cartItems.filter(item=>item.cart==cart.id)
       let total = 0
-      let items_html = ""
+      let items_html = []
       let items_count = 0
-      items.forEach(item=>{
+      for (let item of items){
+        let product = await get_data(get_Products_url+item.product)
         items_count+=item.quantity
-        total+=item.quantity*item.product_price
-        items_html+=`<div class="flex justify-between mb-2">
-                        <span>${item.product_name} x${item.quantity}</span>
-                        <span>$${item.product_price*item.quantity}</span>
-                      </div>`
-                    })
-                    desktopQuantity.innerText = items_count
-                    desktopItemsSpan.innerHTML = items_html
-                    desktopTotalSpan.innerText = "$"+total
-                    mobileItemsSpan.innerText = items.length + (items.length==1?" item":" items")
+        total+=item.quantity*getPrice(product.price,product.discount)
+        items_html.push(`<div class="flex justify-between mb-2">
+          <span>${product.name} x${item.quantity}</span>
+          <span>$${getPrice(product.price,product.discount)*item.quantity}</span>
+        </div>`)
+      }
+      desktopItemsSpan.innerHTML = items_html.join("")
+      desktopQuantity.innerText = items_count
+      desktopTotalSpan.innerText = "$"+total
+      mobileItemsSpan.innerText = items.length + (items.length==1?" item":" items")
       mobileTotalSpan.innerText = total
       
     }
     catch(err){
-      const cart = localStorage.getItem("cart")?JSON.parse(localStorage.getItem("cart")):{}
+      const cart = localStorage.getItem("cart")?JSON.parse(localStorage.getItem("cart")):localStorage.setItem("cart", JSON.stringify([]))
       let items_html = ""
       let total = 0
       let items_count = 0
-      for(const item in cart){
-        items_count+=cart[item].quantity
-        total+=cart[item].quantity*cart[item].price
+      for(const item of cart){
+        items_count+=item.quantity
+        total+=item.quantity*item.price
         items_html+=`<div class="flex justify-between mb-2">
-                        <span>${cart[item].name} x${cart[item].quantity}</span>
-                        <span>$${cart[item].price*cart[item].quantity}</span>
+                        <span>${item.name} x${item.quantity}</span>
+                        <span>$${item.price*item.quantity}</span>
                       </div>`
       }
       desktopQuantity.innerText = items_count

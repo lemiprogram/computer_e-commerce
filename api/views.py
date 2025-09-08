@@ -52,10 +52,22 @@ def post_model(request, model):
         return Response('posted successfully', status=204)
     return Response({"error":  "faild post"}, status=404)
 
+@api_view(['PATCH'])
+def patch_model(request, model,pk):
+    my_model, my_serializer = MY_MODELS[get_capital(model)]
+    instance = get_object_or_404(my_model, pk=pk)
+    serializer = my_serializer(instance,data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response('posted successfully', status=204)
+    return Response({"error":  "faild post"}, status=404)
+
 @api_view(['GET'])
 def get_user(request):
+    if not request.user.is_authenticated:
+        return Response({})
     serializer = CustomUserSerializer(request.user)
-    return Response(serializer.data )
+    return Response(serializer.data)
 
 @api_view(['GET'])
 def get_model_by_page(request, model, page_amount):
