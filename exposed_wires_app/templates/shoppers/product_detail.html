@@ -68,7 +68,7 @@
     <span id="cart-quantity" class="font-bold text-lg">1</span>
     <button id="increase-qty" class="bg-gray-300 px-3 py-1 rounded">+</button>
 </div>
-                    <button class="bg-accent-200 hover:bg-accent-100 text-white px-6 py-3 rounded-lg shadow-md">
+                    <button id="buy-now-btn" class="bg-accent-200 hover:bg-accent-100 text-white px-6 py-3 rounded-lg shadow-md">
                         Buy Now
                     </button>
                 </div>
@@ -104,7 +104,7 @@
     const addToCartBtn = document.getElementById("add-to-cart-btn");
     const quantityControls = document.getElementById("cart-quantity-controls");
     const qtyDisplay = document.getElementById("cart-quantity");
-
+    const buyNowBtn = document.getElementById("buy-now-btn");
 
     const productId = addToCartBtn.dataset.productId; 
     let cart = null;
@@ -259,6 +259,27 @@ function updateCartUI() {
             
         
     });
-
+    buyNowBtn.addEventListener("click", function(){
+        if (!user) {
+            notify("Please log in to proceed", "error");
+            setTimeout(() => {
+                openLoginModal();
+            }, 1000);
+            return;
+        }
+        if (!shopper) {
+            notify("No shopper profile found", "error");
+            return;
+        }
+        if (!cart) {
+            notify("No cart found for shopper", "error");
+            return;
+        }
+        if (!cartItemId) {
+            notify("Please add the product to cart first", "error");
+            return;
+        }
+        window.location.href = `/checkout/${cart.id}/`;
+    })
 </script>
 {%endblock%}

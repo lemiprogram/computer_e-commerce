@@ -15,24 +15,29 @@
 
   <!-- Dropdown Menu -->
   <ul id="category-dropdown" 
-      class="absolute top-full left-0 w-full bg-white shadow-lg rounded-b-lg hidden max-h-60 overflow-y-auto z-50">
+      class="absolute top-full left-0 w-full shadow-lg rounded-b-lg hidden max-h-60 overflow-y-auto z-50">
   </ul>
 </div>
 <script>
   // Example categories (you can replace this with data from Django context or API)
-  const categories = []
+  let categories = []
 
   const searchInput = document.getElementById("search-input");
   const searchBtn = document.getElementById("search-btn");
   const categoryDropdown = document.getElementById("category-dropdown");
-
+  const productCount = {}
   // Function to filter categories
-  function filterCategories(query) {
-    return categories.filter(cat => cat.toLowerCase().includes(query.toLowerCase()));
+  async function filterCategories(query) {
+    categories = await get_data(get_Categories_url+0)
+    let products = await get_data(get_Products_url+0)
+    categories.forEach(cat => {
+      productCount[cat.name] = products.filter(prod => prod.category === cat.id)
+    });
+    return categories.filter(cat => cat.name.toLowerCase().includes(query.toLowerCase()));
   }
 
   // Show dropdown while typing
-  searchInput.addEventListener("input", () => {
+  searchInput.addEventListener("input", async () => {
     const query = searchInput.value.trim();
     categoryDropdown.innerHTML = "";
 
@@ -40,16 +45,35 @@
       categoryDropdown.classList.add("hidden");
       return;
     }
+    categoryDropdown.classList.remove("hidden");
 
-    const results = filterCategories(query);
+    const results = await filterCategories(query);
 
     if (results.length > 0) {
       results.forEach(cat => {
+        
         const li = document.createElement("li");
-        li.textContent = cat;
-        li.className = "p-2 hover:bg-accent-100 cursor-pointer";
+        const img = document.createElement('img');
+        const p = document.createElement('p');
+        const count = document.createElement('span');
+        const div = document.createElement('div');
+        div.className = "flex gap-4 items-center"
+        count.textContent = productCount[cat.name].length;
+        count.className = "text-sm text-white bg-primary-100 w-8 h-8 rounded-full flex items-center justify-center";
+        li.className = "flex gap-5 justify-between items-center p-2 w-full bg-bg-100 hover:bg-accent-100 text-text-100 hover:text-white cursor-pointer px-4 py-2";
+        p.textContent = cat.name;
+        p.className = "font-bold";
+
+        img.src = "http://res.cloudinary.com/duxorzcjg/"+cat.image
+        img.className = "w-10 h-10 object-contain rounded-full";
+
+        div.appendChild(img);
+        div.appendChild(p);
+        li.appendChild(div);
+        li.appendChild(count);
         li.addEventListener("click", () => {
-          searchInput.value = cat; // set clicked value
+          window.location.href = `/categories/${encodeURIComponent(cat.name)}`;
+          searchInput.value = cat.name; // set clicked value
           categoryDropdown.classList.add("hidden");
         });
         categoryDropdown.appendChild(li);
@@ -67,7 +91,7 @@
 
     // Redirect to category page with query filter
     // Example: /categories/<category>/?q=<query>
-    window.location.href = `/search/${encodeURIComponent(query)}`;
+    window.location.href = `/categories/${encodeURIComponent(query)}`;
   }
 
   // Search button click

@@ -11,6 +11,10 @@ urlpatterns = [
     path("products/<int:pk>/", product_detail_view, name="product_detail"),
     path("categories/", category_list, name="category_list"),
     path("categories/<str:category_name>/", category_detail, name="category_products"),
+    path("checkout/", checkout, name="checkout"),
+    path("place-order/", place_order, name="place_order"),
+
+
     path("seller/dashboard/", seller_dashboard, name="seller_dashboard"),
     path("seller/manage_products/", manage_products, name="manage_products"),
     path("seller/manage_products/add/", add_product, name="add_product"),

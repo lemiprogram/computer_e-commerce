@@ -11,8 +11,6 @@
     <div class="hidden md:flex space-x-6 items-center">
       <a href="/shop" class="text-white hover:text-gray-300 cursor-pointer">Shop</a>
       <a href="/categories" class="text-white hover:text-gray-300 cursor-pointer">Categories</a>
-      <a href="/deals" class="text-white hover:text-gray-300 cursor-pointer">Deals</a>
-      <a href="/wishlist" class="text-white hover:text-gray-300 cursor-pointer">Wishlist</a>
 
       <!-- Account -->
       <button id="account-btn" class="flex justify-center items-center text-white hover:text-primary-300 cursor-pointer  rounded-full bg-primary-200 capitalize text-lg w-8 h-8">
@@ -88,8 +86,6 @@
     <!-- Links -->
     <a href="/shop" class="block font-bold p-4 text-white hover:text-text-100 hover:bg-primary-200 cursor-pointer">Shop</a>
     <a href="/categories" class="block font-bold p-4 text-white hover:text-text-100 hover:bg-primary-200 cursor-pointer">Categories</a>
-    <a href="/deals" class="block font-bold p-4 text-white hover:text-text-100 hover:bg-primary-200 cursor-pointer">Deals</a>
-    <a href="/wishlist" class="block font-bold p-4 text-white hover:text-text-100 hover:bg-primary-200 cursor-pointer">Wishlist</a>
     <div id="mobile-account-btn" class="block font-bold p-4 text-white hover:text-text-100 hover:bg-primary-200 cursor-pointer capitalize  ">
       {% if user.is_authenticated %}
         {{user.username}}

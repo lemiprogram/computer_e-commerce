@@ -60,6 +60,33 @@ def product_detail_view(request, pk):
         "product": product,
         'price':float(product.price) * (1 - (product.discount / 100))
     })
+
+def checkout(request):
+    user = request.user
+    shopper = Shopper.objects.get(user=user)
+    cart = Cart.objects.get(shopper=shopper)
+
+    return render(request, "shoppers/checkout.html", {"cart": cart})
+
+def place_order(request):
+    user = request.user
+    shopper = Shopper.objects.get(user=user)
+    cart = get_object_or_404(Cart, shopper=shopper)
+
+    
+    for item in CartItem.objects.filter(cart=cart):
+        Order.objects.create(
+            shopper=shopper,
+            product=item.product,
+            quantity=item.quantity,
+            total_price=item.product.get_discounted_price() * item.quantity
+        )
+
+        # Clear cart
+        CartItem.objects.filter(cart=cart).delete()
+
+    return redirect("checkout")
+
 def wishlist(request):
     return render(request, 'shoppers/wishlist.html')
 def deals(request):
