@@ -21,7 +21,7 @@
   <div id="notifications" class="fixed top-4 right-4 space-y-3 z-50"></div>
 
   <!-- Sellers Grid -->
-  <div id="sellersGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  <div id="sellersGrid" class="flex flex-col gap-6">
     <!-- Seller cards will load here -->
   </div>
 
@@ -91,9 +91,10 @@
       let user = await get_data(get_CustomUser_url+seller.user);
 
       const card = document.createElement("div");
-      card.className = "bg-bg-100 rounded-xl shadow-lg p-6 flex flex-col items-center text-center";
-
-      card.innerHTML = `
+      
+      const fullCard =()=>{
+        card.className = "bg-bg-100 max-w-sm rounded-xl shadow-lg p-6 flex flex-col items-center text-center";
+        card.innerHTML = `
         ${ user.profile_pic
           ? `<img src="${user.profile_pic}" alt="${user.username}" class="w-20 h-20 rounded-full object-cover mb-4">`
           : `<div class="w-20 h-20 rounded-full bg-bg-300 flex items-center justify-center text-xl font-bold text-white mb-4">
@@ -107,16 +108,29 @@
           <span class="font-medium text-primary-100">${seller.storeName}</span>
         </p>
 
-        <div class="mt-4 flex gap-4">
-          <a href="/sellers/${seller.id}" class="px-4 py-2 bg-primary-100 text-white rounded-lg hover:bg-primary-200">
-            View
-          </a>
+        <div class="mt-4 flex gap-4 justify-end">
           <button onclick="deleteSeller(${seller.user}, '${user.username}')" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
             Delete
           </button>
         </div>
-      `;
+        `;
+      } 
+      const halfCard = ()=>{
+        card.className = "bg-bg-100 max-w-sm rounded-md  shadow-lg p-6 gap-5 flex items-center text-center";
+        card.innerHTML = `
+          ${ user.profile_pic
+          ? `<img src="${user.profile_pic}" alt="${user.username}" class="w-20 h-20 rounded-full object-cover mb-4">`
+          : `<div class="w-20 h-20 rounded-full bg-bg-300 flex items-center justify-center text-xl font-bold text-white mb-4">
+               ${user.username.charAt(0).toUpperCase()}
+             </div>`
+        }
 
+        <h2 class="text-lg font-semibold text-text-100">${user.username}</h2>
+        `
+      }
+      card.addEventListener('mouseenter',fullCard)
+      card.addEventListener('mouseout',halfCard)
+      halfCard()
       grid.appendChild(card);
     }
   }

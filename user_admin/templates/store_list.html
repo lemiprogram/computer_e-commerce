@@ -76,7 +76,7 @@
 
       card.innerHTML = `
         ${ store.profile_image
-          ? `<img src="${store.profile_image}" alt="${store.name}" class="w-20 h-20 rounded-full object-cover mb-4">`
+          ? `<img src="http://res.cloudinary.com/duxorzcjg/${store.profile_image}" alt="${store.name}" class="w-20 h-20 rounded-full object-cover mb-4">`
           : `<div class="w-20 h-20 rounded-full bg-bg-300 flex items-center justify-center text-xl font-bold text-white mb-4">
                ${store.name.charAt(0).toUpperCase()}
              </div>`
@@ -156,23 +156,26 @@
       const store = storesData.find(s => s.id === id);
       store.is_active = !current;
       renderStores(storesData);
-      showNotification(`Store "${store.name}" ${store.is_active ? "activated" : "deactivated"}.`, "success");
+      notify(`Store "${store.name}" ${store.is_active ? "activated" : "deactivated"}.`, "success");
     } else {
-      showNotification("Failed to update store status.", "error");
+      notify("Failed to update store status.", "error");
     }
   }
 
   // Toggle Verified
   async function toggleVerified(id, current) {
-    const res = await patch_data(patch_Stores_url+id, { verified: !current });
-    if (res.ok) {
-      const store = storesData.find(s => s.id === id);
-      store.verified = !current;
-      renderStores(storesData);
-      showNotification(`Store "${store.name}" ${store.verified ? "verified" : "unverified"}.`, "success");
-    } else {
-      showNotification("Failed to update store verification.", "error");
+    try {
+      await patch_data(patch_Stores_url+id, { verified: !current });
+    } catch (error) {
+      
+    const store = storesData.find(s => s.id === id);
+    store.verified = !current;
+    renderStores(storesData);
+    console.log('it works')
+    notify(`Store "${store.name}" ${store.verified ? "verified" : "unverified"}.`, "success");
+      return;
     }
+    
   }
 
   // Init load

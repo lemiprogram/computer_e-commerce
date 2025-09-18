@@ -39,7 +39,7 @@
     <!-- Newest Stores -->
     <div class="p-6 bg-white rounded-xl shadow-lg lg:col-span-2">
       <h3 class="text-lg font-semibold text-text-100 mb-4">Newest Stores</h3>
-      <ul id="Newest-stores" class="grid grid-cols-1 md:grid-cols-2 gap-4"></ul>
+      <ul id="Newest-stores" class="flex flex-col gap-4"></ul>
     </div>
   </div>
 </div>
@@ -84,7 +84,7 @@
   for (let shopper of shoppers.slice(-5)){
     user = await get_data(get_CustomUser_url+shopper.user)
     document.getElementById("Newest-shoppers").innerHTML +=`
-    <li class="flex justify-between">
+    <li class="flex font-bold text-md capitalize justify-between">
       <span>${user.username}</span>
       <span class="text-xs text-text-200">${user.email}</span>
     </li>
@@ -93,24 +93,24 @@
   for (let seller of sellers.slice(-5)){
     user = await get_data(get_CustomUser_url+seller.user)
     document.getElementById("Newest-sellers").innerHTML +=`
-    <li class="flex justify-between">
+    <li class="flex font-bold text-md capitalize justify-between">
       <span>${user.username}</span>
       <span class="text-xs text-text-200">${user.email}</span>
     </li>
     `
   }
+  for (let store of stores.slice(-5)){
+    store = await get_data(get_Stores_url+store.id)
+    store_sellers = sellers.filter(s=>s.store == store.id)
+    document.getElementById("Newest-stores").innerHTML +=`
+    <li class="flex font-bold text-md capitalize items-center  justify-between">
+      <span>${store.name}</span>
+      <span class="w-7 h-7 font-bold grid place-content-center bg-primary-100 text-white rounded-full" >${store_sellers.length}</span>
+    </li>
+    `
+  }
 
  
-  // === Newest STORES ===
-  document.getElementById("Newest-stores").innerHTML = stores.slice(-4).map(store => `
-    <li class="p-4 border rounded-lg flex items-center gap-3">
-      <img src="${store.image}" class="w-12 h-12 object-cover rounded-lg">
-      <div>
-        <h4 class="font-semibold text-text-100">${store.name}</h4>
-        <p class="text-xs text-text-200">Owner: ${store.seller.user.username}</p>
-      </div>
-    </li>
-  `).join("");
 }
 
 loadDashboard();

@@ -13,6 +13,7 @@ urlpatterns = [
     path("categories/<str:category_name>/", category_detail, name="category_products"),
     path("checkout/", checkout, name="checkout"),
     path("place-order/", place_order, name="place_order"),
+    path("stores/<int:pk>/", store_detail, name="store_detail"),
 
 
     path("seller/dashboard/", seller_dashboard, name="seller_dashboard"),

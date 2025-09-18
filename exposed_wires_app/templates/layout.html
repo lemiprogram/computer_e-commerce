@@ -103,7 +103,7 @@ async function patch_data(url, patchData) {
         },
         body: JSON.stringify(patchData)
     }).then(res => res.json())
-      .then(data => data);
+      .then(data => data);  
 }
 
 async function delete_data(url) {
@@ -135,6 +135,7 @@ async function delete_data(url) {
 
         const post_CartItems_url = `${BASE_URL}/api/post/CartItems`
         const patch_CartItems_url = `${BASE_URL}/api/patch/CartItems/`
+        const patch_Stores_url = `${BASE_URL}/api/patch/Stores/`
         
 
         const delete_CustomUser_url = `${BASE_URL}/api/delete/Customusers/`;

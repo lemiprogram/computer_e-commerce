@@ -46,7 +46,7 @@ class WishlistSerializer(serializers.ModelSerializer):
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['id', 'username','role']
+        fields = ['id', 'username','role', 'email']
 
 
 
