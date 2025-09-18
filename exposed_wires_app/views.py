@@ -242,13 +242,13 @@ def edit_store(request, pk):
         "staff_members": staff_members
     })
 def store_detail(request, pk):
-    """
-    Display detailed info about a store,
-    including its products and staff (admins + sellers).
-    """
     store = get_object_or_404(Store, pk=pk)
+    products = Product.objects.filter(seller__store=store)
+    staff = Seller.objects.filter(store=store)
 
     context = {
         "store": store,
+        "products": products,
+        "staff": staff,
     }
     return render(request, "sellers/store_detail.html", context)

@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto py-10">
+  <h1 class="text-2xl font-bold mb-6">Checkout</h1>
+
+  <div class="bg-bg-200 rounded-2xl p-6 shadow">
+    <ul class="space-y-4">
+      {% for item in cart.items.all %}
+        <li class="flex justify-between border-b pb-2">
+          <span>{{ item.product.name }} (x{{ item.quantity }})</span>
+          <span>${{ item.subtotal }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+
+    <div class="flex justify-between mt-6 font-bold">
+      <span>Total:</span>
+      <span>${{ cart.total_price }}</span>
+    </div>
+
+    <form action="{% url 'place_order' %}" method="POST" class="mt-6">
+      {% csrf_token %}
+      <button type="submit" class="bg-primary-200 hover:bg-primary-100 text-white px-6 py-3 rounded-lg">
+        Place Order
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

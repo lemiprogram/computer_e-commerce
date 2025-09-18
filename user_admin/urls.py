@@ -13,7 +13,7 @@ urlpatterns = [
     path("filters/", admin_filter_list, name="admin_filter_list"),
     path("filters/assign/<int:category_id>/<int:filter_id>/", assign_filter, name="assign_filter"),
     path("filters/create/", admin_create_filter, name="admin_create_filter"),
-
+    path('stores/<int:pk>/', admin_store_detail, name='admin_store_detail'),
 
     path("sellers/", admin_seller_list, name="admin_seller_list"),
     path("shoppers/", admin_shopper_list, name="admin_shopper_list"),

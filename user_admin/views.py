@@ -117,3 +117,16 @@ def admin_create_filter(request):
         Filter.objects.get_or_create(key=key.strip())
     return redirect("admin_filter_list")
 
+
+@admin_required
+def admin_store_detail(request, pk):
+    store = get_object_or_404(Store, pk=pk)
+    products = Product.objects.filter(seller__store=store)
+    staff = Seller.objects.filter(store=store)
+
+    context = {
+        "store": store,
+        "products": products,
+        "staff": staff,
+    }
+    return render(request, "store_detail.html", context)
