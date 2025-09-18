@@ -1,82 +1,147 @@
 {% extends "layout.html" %}
-{% block content %}
-<div class="max-w-6xl mx-auto p-6">
 
-  <!-- Page Title -->
-  <h1 class="text-3xl font-bold text-primary-100 mb-6">Orders</h1>
-  <p class="text-text-100 mb-6">View and manage customer orders for your products.</p>
+{% block content %}
+<div class="p-6 space-y-8">
+
+  <!-- Page Header -->
+  <div class="flex justify-between items-center">
+    <h1 class="text-3xl font-bold text-primary-100">Manage Orders</h1>
+    <input 
+      type="text" 
+      id="orderSearch" 
+      placeholder="Search by customer or status..." 
+      class="border rounded-lg p-2 w-64"
+    />
+  </div>
 
   <!-- Orders Table -->
-  <div class="overflow-x-auto bg-bg-200 shadow-md rounded-2xl">
-    <table class="min-w-full text-left border-collapse">
+  <div class="bg-bg-200 p-6 rounded-2xl shadow-md overflow-x-auto">
+    <table class="w-full text-left border-collapse" id="ordersTable">
       <thead>
-        <tr class="bg-bg-300 text-text-100">
-          <th class="p-4">Order ID</th>
-          <th class="p-4">Product</th>
-          <th class="p-4">Buyer</th>
-          <th class="p-4">Quantity</th>
-          <th class="p-4">Total Price</th>
-          <th class="p-4">Status</th>
-          <th class="p-4">Date</th>
-          <th class="p-4">Actions</th>
+        <tr class="text-text-100 border-b border-gray-300">
+          <th class="p-2">Order ID</th>
+          <th class="p-2">Customer</th>
+          <th class="p-2">Total</th>
+          <th class="p-2">Status</th>
+          <th class="p-2">Date</th>
+          <th class="p-2">Actions</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-gray-200">
-        {% for order in orders %}
-        <tr class="hover:bg-bg-300">
-          <!-- Order ID -->
-          <td class="p-4 font-semibold text-text-100">#{{ order.id }}</td>
-
-          <!-- Product -->
-          <td class="p-4">{{ order.product.name }}</td>
-
-          <!-- Buyer -->
-          <td class="p-4">{{ order.shopper.user.username }}</td>
-
-          <!-- Quantity -->
-          <td class="p-4">{{ order.quantity }}</td>
-
-          <!-- Total Price -->
-          <td class="p-4">${{ order.total_price }}</td>
-
-          <!-- Status -->
-          <td class="p-4">
-            {% if order.status == "Pending" %}
-              <span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded-lg">Pending</span>
-            {% elif order.status == "Shipped" %}
-              <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded-lg">Shipped</span>
-            {% elif order.status == "Delivered" %}
-              <span class="bg-green-100 text-green-700 px-2 py-1 rounded-lg">Delivered</span>
-            {% elif order.status == "Cancelled" %}
-              <span class="bg-red-100 text-red-700 px-2 py-1 rounded-lg">Cancelled</span>
-            {% endif %}
-          </td>
-
-          <!-- Date -->
-          <td class="p-4 text-sm text-gray-500">{{ order.created_at|date:"M d, Y" }}</td>
-
-          <!-- Actions -->
-          <td class="p-4 space-x-2">
-            <a href="{% url 'view_order' order.id %}" 
-               class="bg-accent-100 text-text-100 px-3 py-1 rounded-lg shadow hover:bg-accent-200">
-              View
-            </a>
-            <a href="{% url 'update_order_status' order.id %}" 
-               class="bg-primary-100 text-white px-3 py-1 rounded-lg shadow hover:bg-primary-200">
-              Update
-            </a>
-          </td>
-        </tr>
-        {% empty %}
-        <tr>
-          <td colspan="8" class="text-center py-6 text-gray-500">
-            No orders have been placed yet.
-          </td>
-        </tr>
-        {% endfor %}
+      <tbody id="ordersBody">
+        <!-- Filled dynamically -->
       </tbody>
     </table>
   </div>
 
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  let shoppers = null;
+  let users = null;
+  let seller = null;
+  async function loadOrders() {
+    try {
+      shoppers = await get_data(get_Shoppers_url+0); 
+      users = await get_data(get_CustomUser_url+0);
+      let orders = await get_data(get_Orders_url+0);
+      let currentUser = await get_data(get_User_url);
+      let sellers = await get_data(get_Sellers_url+0);
+      seller = sellers.find(s => s.user === currentUser.id);
+      renderOrders(orders);
+    } catch (error) {
+      notify(error, "error");
+    }
+  }
+  const formattedDate = currentDate=>new Date(currentDate).toLocaleDateString('en-US', {
+  weekday: 'long',
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+});
+  function renderOrders(orders) {
+    const tbody = document.getElementById("ordersBody");
+    tbody.innerHTML = "";
+
+    orders.forEach(order => {
+      let shopper = shoppers.find(s => s.id === order.shopper);
+      let shopperUser = users.find(u => u.id === shopper.user);
+      let tr = document.createElement("tr");
+      tr.className = "border-b border-gray-200 hover:bg-gray-50";
+
+      tr.innerHTML = `
+        <td class="p-2">#${order.id}</td>
+        <td class="p-2">${shopperUser.username || "N/A"}</td>
+        <td class="p-2">$${order.total || 0}</td>
+        <td class="p-2">
+          <span class="px-3 py-1 rounded-full text-white ${
+            order.status === "Pending" ? "bg-yellow-500" :
+            order.status === "Shipped" ? "bg-blue-500" :
+            order.status === "Delivered" ? "bg-green-500" :
+            order.status === "Cancelled" ? "bg-red-500" :
+            "bg-gray-500"
+          }">
+            ${order.status}
+          </span>
+        </td>
+        <td class="p-2">${formattedDate(order.created_at) || "—"}</td>
+        <td class="p-2 space-x-2">
+          <button 
+            class="px-3 py-1 bg-primary-100 text-white rounded-lg shadow hover:bg-primary-200"
+            onclick="updateStatus(${order.id}, 'Shipped')">
+            Mark Shipped
+          </button>
+          <button 
+            class="px-3 py-1 bg-green-600 text-white rounded-lg shadow hover:bg-green-700"
+            onclick="updateStatus(${order.id}, 'Delivered')">
+            Mark Delivered
+          </button>
+          <button 
+            class="px-3 py-1 bg-red-600 text-white rounded-lg shadow hover:bg-red-700"
+            onclick="updateStatus(${order.id}, 'Cancelled')">
+            Cancel
+          </button>
+          <button 
+            class="px-3 py-1 bg-gray-600 text-white rounded-lg shadow hover:bg-gray-700"
+            onclick="deleteOrder(${order.id})">
+            Delete
+          </button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  async function updateStatus(orderId, status) {
+    try {
+      await patch_data(`${BASE_URL}/api/patch/Orders/${orderId}`, { status });
+      notify(`Order #${orderId} marked as ${status}`, "success");
+    } catch (error) {
+      loadOrders();
+    }
+  }
+
+  async function deleteOrder(orderId) {
+    if (!confirm("Are you sure you want to delete this order?")) return;
+    try {
+      await delete_data(`${BASE_URL}/api/delete/Orders/${orderId}`);
+      notify(`Order #${orderId} deleted`, "success");
+    } catch (error) {
+      loadOrders();
+    }
+  }
+
+  // Search Orders
+  document.getElementById("orderSearch").addEventListener("input", (e) => {
+    const searchValue = e.target.value.toLowerCase();
+    const rows = document.querySelectorAll("#ordersBody tr");
+    rows.forEach(row => {
+      row.style.display = row.textContent.toLowerCase().includes(searchValue) ? "" : "none";
+    });
+  });
+
+  // Load on page ready
+  document.addEventListener("DOMContentLoaded", loadOrders);
+</script>
 {% endblock %}

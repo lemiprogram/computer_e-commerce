@@ -87,7 +87,7 @@
         let products = await get_data(get_Products_url+0) || [];
         products = products.filter(p=>p.seller == seller.id)
         let orders = await get_data(get_Orders_url+0) || [];
-        orders = orders.filter(o=>o.product==products.id)
+        orders = orders.filter(o=>products.map(p=>p.id).includes(o.product))
 
         // Stats
         document.getElementById("product-count").innerText = products.length;
@@ -98,11 +98,11 @@
         const ordersTable = document.getElementById("recent-orders");
         ordersTable.innerHTML = "";
         if (orders.length) {
-            orders.slice(0, 5).forEach(o => {
+            orders.slice(0, 3).forEach(o => {
                 ordersTable.innerHTML += `
                   <tr class="border-b border-bg-300">
                     <td class="py-2">#${o.id}</td>
-                    <td class="py-2">${o.product?.name || "N/A"}</td>
+                    <td class="py-2">${products.find(p => p.id === o.product)?.name || "N/A"}</td>
                     <td class="py-2">${o.quantity}</td>
                     <td class="py-2"><span class="px-3 py-1 rounded-lg text-text-100">${o.status}</span></td>
                     <td class="py-2">${new Date(o.created_at).toLocaleDateString()}</td>
