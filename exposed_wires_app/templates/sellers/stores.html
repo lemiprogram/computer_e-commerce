@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="min-h-screen bg-bg-100 p-8">
-  <div class="max-w-5xl mx-auto bg-bg-300 shadow-xl rounded-2xl p-8">
+  <div class="max-w-5xl mx-auto  shadow-xl rounded-2xl p-8">
 
     <h1 class="text-3xl font-bold text-primary-100 mb-8">My Store</h1>
 
@@ -50,7 +50,7 @@
           {% for seller in staff %}
             <div class="bg-bg-300 rounded-lg shadow-lg p-4 text-center">
               {% if seller.profile_image %}
-                <img src="{{ seller.Profile_image}}" 
+                <img src="{{seller.profile_image}}" 
                      class="w-20 h-20 mx-auto rounded-full mb-3 object-cover">
               {% else %}
                 <div class="w-20 h-20 mx-auto rounded-full bg-bg-200 flex items-center justify-center mb-3 text-text-200">

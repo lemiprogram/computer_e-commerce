@@ -120,8 +120,106 @@ def manage_products(request):
 
 def manage_orders(request):
     return render(request, "sellers/manage_orders.html")
+# shoppers/views.py
+from django.db.models import Count, Sum, F
+from django.db.models.functions import TruncDate
+import json
 def reports(request):
-    return render(request, 'sellers/reports.html')
+    # === Summary Metrics ===
+    total_orders = len(Order.objects.filter(product__seller__user=request.user))
+    total_revenue = Order.objects.filter(product__seller__user=request.user).aggregate(total=Sum("total_price"))["total"] or 0
+    avg_order_value = (
+        Order.objects.aggregate(avg=Sum("total_price") / Count("id"))["avg"] or 0
+        if total_orders > 0 else 0
+    )
+    avg_order_value = round(float(avg_order_value),2)
+    pending_orders = Order.objects.filter(status="Pending").count()
+
+    # === Best-Selling Products ===
+    best_sellers = (
+        Order.objects.values("product__name")
+        .annotate(
+            units_sold=Sum("quantity"),
+            revenue=Sum("total_price")
+        )
+        .order_by("-units_sold")[:5]
+    )
+    best_sellers = [
+        {"name": item["product__name"], "units_sold": item["units_sold"], "revenue": item["revenue"]}
+        for item in best_sellers
+    ]
+
+    # === Top Customers ===
+    top_customers = (
+        Order.objects.values("shopper__user__username")
+        .annotate(
+            order_count=Count("id"),
+            total_spent=Sum("total_price")
+        )
+        .order_by("-total_spent")[:5]
+    )
+    top_customers = [
+        {"name": item["shopper__user__username"], "order_count": item["order_count"], "total_spent": item["total_spent"]}
+        for item in top_customers
+    ]
+
+    # === Datasets for Charts ===
+    # Sales Over Time
+    sales_over_time = (
+        Order.objects.annotate(date=TruncDate("created_at"))
+        .values("date")
+        .annotate(total=Sum("total_price"))
+        .order_by("date")
+    )
+    sales_dates = [item["date"].strftime("%Y-%m-%d") for item in sales_over_time]
+    sales_totals = [float(item["total"]) for item in sales_over_time]
+
+    # Orders by Status
+    orders_status = [
+        Order.objects.filter(status=status).count()
+        for status in ["Pending", "Shipped", "Delivered", "Cancelled"]
+    ]
+
+    # Revenue by Category
+    category_revenue = (
+        Order.objects.values("product__category__name")
+        .annotate(revenue=Sum("total_price"))
+        .order_by("-revenue")
+    )
+    category_names = [item["product__category__name"] or "Uncategorized" for item in category_revenue]
+    category_totals = [float(item["revenue"]) for item in category_revenue]
+
+    # Orders by City
+    city_orders = (
+        Order.objects.values("shopper__city")
+        .annotate(count=Count("id"))
+        .order_by("-count")
+    )
+    city_names = [item["shopper__city"] or "Unknown" for item in city_orders]
+    city_counts = [item["count"] for item in city_orders]
+
+    # === JSON datasets for JS ===
+    datasets = {
+        "sales_dates": sales_dates,
+        "sales_totals": sales_totals,
+        "orders_status": orders_status,
+        "category_names": category_names,
+        "category_revenue": category_totals,
+        "city_names": city_names,
+        "city_orders": city_counts,
+    }
+
+    context = {
+        "total_orders": total_orders,
+        "total_revenue": total_revenue,
+        "avg_order_value": avg_order_value,
+        "pending_orders": pending_orders,
+        "best_sellers": best_sellers,
+        "top_customers": top_customers,
+        "datasets": json.dumps(datasets),  # safe for JS
+    }
+    return render(request, "sellers/reports.html", context)
+
 def seller_account(request):
     seller = Seller.objects.get(user=request.user)
     if request.method == "POST":

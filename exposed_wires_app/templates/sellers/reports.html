@@ -26,33 +26,6 @@
     </div>
   </div>
 
-  <!-- Filters -->
-  <div class="bg-bg-200 p-6 rounded-2xl shadow-md mt-8">
-    <h2 class="text-xl font-semibold text-primary-100 mb-4">Filter Reports</h2>
-    <form class="flex flex-wrap gap-4">
-      <div>
-        <label class="block text-sm mb-1 text-text-100">Date From</label>
-        <input type="date" class="p-2 rounded-lg bg-bg-300 text-text-100">
-      </div>
-      <div>
-        <label class="block text-sm mb-1 text-text-100">Date To</label>
-        <input type="date" class="p-2 rounded-lg bg-bg-300 text-text-100">
-      </div>
-      <div>
-        <label class="block text-sm mb-1 text-text-100">Status</label>
-        <select class="p-2 rounded-lg bg-bg-300 text-text-100">
-          <option>All</option>
-          <option>Pending</option>
-          <option>Shipped</option>
-          <option>Completed</option>
-        </select>
-      </div>
-      <div class="flex items-end">
-        <button type="submit" class="bg-primary-100 text-white px-4 py-2 rounded-lg shadow hover:bg-primary-200">Apply</button>
-      </div>
-    </form>
-  </div>
-
   <!-- Best Selling Products -->
   <div class="bg-bg-200 p-6 rounded-2xl shadow-md mt-8">
     <h2 class="text-xl font-semibold text-primary-100 mb-4">Best-Selling Products</h2>
@@ -113,24 +86,19 @@
       <h2 class="text-xl font-semibold text-primary-100 mb-4">Orders by Status</h2>
       <canvas id="ordersByStatus"></canvas>
     </div>
-    <div class="bg-bg-200 p-6 rounded-2xl shadow-md">
+    <div class="bg-bg-200 p-6 rounded-2xl shadow-md w-full md:col-span-2">
       <h2 class="text-xl font-semibold text-primary-100 mb-4">Revenue by Category</h2>
       <canvas id="revenueByCategory"></canvas>
     </div>
-    <div class="bg-bg-200 p-6 rounded-2xl shadow-md">
-      <h2 class="text-xl font-semibold text-primary-100 mb-4">Orders by City</h2>
-      <canvas id="ordersByCity"></canvas>
-    </div>
+    
   </div>
-
-
 
 </div>
 
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<!-- Embed datasets -->
+<!-- Datasets for JS -->
 <script id="datasets" type="application/json">
   {{ datasets|safe }}
 </script>
@@ -158,7 +126,7 @@
   new Chart(document.getElementById('ordersByStatus'), {
     type: 'doughnut',
     data: {
-      labels: ['Pending', 'Shipped', 'Completed', 'Cancelled'],
+      labels: ['Pending', 'Shipped', 'Delivered', 'Cancelled'],
       datasets: [{
         data: datasets.orders_status,
         backgroundColor: ['#fbbf24','#3b82f6','#22c55e','#ef4444']
@@ -179,21 +147,6 @@
     }
   });
 
-  // Orders by City (Horizontal Bar)
-  new Chart(document.getElementById('ordersByCity'), {
-    type: 'bar',
-    data: {
-      labels: datasets.city_names,
-      datasets: [{
-        label: 'Orders',
-        data: datasets.city_orders,
-        backgroundColor: '#22c55e'
-      }]
-    },
-    options: {
-      indexAxis: 'y'
-    }
-  });
-</script>
+  </script>
 
 {% endblock %}
